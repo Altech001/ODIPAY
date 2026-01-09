@@ -297,7 +297,7 @@
 
 @utility menu-dropdown-item-active {
   @apply bg-brand-50 text-brand-500;
-  @apply dark:bg-brand-500/15 dark:text-brand-400 dark:shadow-[0_0_10px_rgba(70, 95, 255, 0.2)];
+  @apply dark:bg-brand-500/15 dark:text-brand-400 dark:shadow-[0_0_10px_rgba(70,95,255,0.2)];
 }
 
 @utility menu-dropdown-item-inactive {
@@ -401,19 +401,19 @@
 .apexcharts-legend-text {
   @apply !text-gray-700;
 
-  @apply dark: !text-gray-400;
+  @apply dark:!text-gray-400;
 }
 
 .apexcharts-text {
   @apply !fill-gray-700;
 
-  @apply dark: !fill-gray-400;
+  @apply dark:!fill-gray-400;
 }
 
 .apexcharts-tooltip.apexcharts-theme-light {
   @apply gap-1 !rounded-lg !border-gray-200 p-3 !shadow-theme-sm;
 
-  @apply dark: !border-gray-800 !bg-gray-900;
+  @apply dark:!border-gray-800 !bg-gray-900;
 }
 
 .apexcharts-tooltip-marker {
@@ -425,7 +425,7 @@
 .apexcharts-legend-text {
   @apply !pl-5 !text-gray-700;
 
-  @apply dark: !text-gray-400;
+  @apply dark:!text-gray-400;
 }
 
 .apexcharts-tooltip-series-group {
@@ -439,13 +439,13 @@
 .apexcharts-tooltip-title {
   @apply !mb-0 !border-b-0 !bg-transparent !p-0 !text-[10px] !leading-4 !text-gray-800;
 
-  @apply dark: !text-white/90;
+  @apply dark:!text-white/90;
 }
 
 .apexcharts-tooltip-text {
   @apply !text-theme-xs !text-gray-700;
 
-  @apply dark: !text-white/90;
+  @apply dark:!text-white/90;
 }
 
 .apexcharts-tooltip-text-y-value {
@@ -455,7 +455,7 @@
 .apexcharts-gridline {
   @apply !stroke-gray-100;
 
-  @apply dark: !stroke-gray-800;
+  @apply dark:!stroke-gray-800;
 }
 
 #chartTwo .apexcharts-datalabels-group {
@@ -465,13 +465,13 @@
 #chartTwo .apexcharts-datalabels-group .apexcharts-text {
   @apply !fill-gray-800 !font-semibold;
 
-  @apply dark: !fill-white/90;
+  @apply dark:!fill-white/90;
 }
 
 #chartDarkStyle .apexcharts-datalabels-group .apexcharts-text {
   @apply !fill-gray-800 !font-semibold;
 
-  @apply dark: !fill-white/90;
+  @apply dark:!fill-white/90;
 }
 
 #chartSixteen .apexcharts-legend {
@@ -481,7 +481,7 @@
 .jvectormap-container {
   @apply !bg-gray-50;
 
-  @apply dark: !bg-gray-900;
+  @apply dark:!bg-gray-900;
 }
 
 .jvectormap-region.jvectormap-element {
@@ -491,13 +491,13 @@
     @apply !fill-brand-500;
   }
 
-  @apply dark: !fill-gray-700 hover: !fill-brand-500;
+  @apply dark:!fill-gray-700 hover:!fill-brand-500;
 }
 
 .jvectormap-marker.jvectormap-element {
   @apply !stroke-gray-200;
 
-  @apply dark: !stroke-gray-800;
+  @apply dark:!stroke-gray-800;
 }
 
 .jvectormap-tip {
@@ -518,7 +518,7 @@
 .stocks-slider-outer .swiper-button-prev {
   @apply static !mt-0 h-8 w-9 rounded-full border border-gray-200 !text-gray-700 transition;
 
-  @apply dark:hover:bg-white/[0.05] border-white/[0.03] bg-gray-800 !text-gray-400 hover: !text-white/90;
+  @apply dark:hover:bg-white/[0.05] border-white/[0.03] bg-gray-800 !text-gray-400 hover:!text-white/90;
 
   &:hover {
     @apply bg-gray-100;
@@ -542,9 +542,9 @@
 }
 
 .flatpickr-calendar {
-  @apply mt-2 !bg-white !rounded-xl !p-5 !border !border-gray-200 !shadow-theme-md !text-gray-500 2xsm: !w-auto;
+  @apply mt-2 !bg-white !rounded-xl !p-5 !border !border-gray-200 !shadow-theme-md !text-gray-500 2xsm:!w-auto;
 
-  @apply dark: !border-white/5 dark: !bg-gray-dark !text-gray-400 !shadow-theme-xl;
+  @apply dark:!border-white/5 dark:!bg-gray-dark !text-gray-400 !shadow-theme-xl;
 
   box-shadow: 0px 4px 8px -2px rgba(16, 24, 40, 0.1),
     0px 2px 4px -2px rgba(16, 24, 40, 0.06) !important;
@@ -573,7 +573,7 @@
 .flatpickr-current-month input.cur-year {
   @apply !h-auto !pt-0 !text-lg !font-medium !text-gray-800;
 
-  @apply dark: !text-white/90;
+  @apply dark:!text-white/90;
 }
 
 .flatpickr-prev-month,
@@ -588,13 +588,13 @@
 .flatpickr-weekday {
   @apply !text-theme-sm !font-medium !text-gray-500 !bg-transparent;
 
-  @apply dark: !text-gray-400;
+  @apply dark:!text-gray-400;
 }
 
 .flatpickr-day {
   @apply !flex !items-center !text-theme-sm !font-medium !text-gray-800;
 
-  @apply dark: !text-white/90 hover: !border-gray-300 hover: !bg-gray-900;
+  @apply dark:!text-white/90 hover:!border-gray-300 hover:!bg-gray-900;
 }
 
 .flatpickr-day.nextMonthDay,
@@ -622,7 +622,7 @@
 .flatpickr-months .flatpickr-next-month {
   @apply !top-7 !bg-transparent;
 
-  @apply dark: !fill-white dark: !text-white;
+  @apply dark:!fill-white dark:!text-white;
 }
 
 .flatpickr-months .flatpickr-prev-month.flatpickr-prev-month,
@@ -643,7 +643,7 @@ span.flatpickr-weekday,
 .flatpickr-months .flatpickr-month {
   @apply !bg-none;
 
-  @apply dark: !fill-white dark: !text-white;
+  @apply dark:!fill-white dark:!text-white;
 }
 
 .flatpickr-innerContainer {
@@ -657,7 +657,7 @@ span.flatpickr-weekday,
 .flatpickr-day.inRange {
   box-shadow: -5px 0 0 #f9fafb, 5px 0 0 #f9fafb !important;
 
-  @apply dark: !shadow-datepicker;
+  @apply dark:!shadow-datepicker;
 }
 
 .flatpickr-day.inRange,
@@ -674,7 +674,7 @@ span.flatpickr-weekday,
 .flatpickr-day.nextMonthDay:focus {
   @apply !border-gray-50 !bg-gray-50;
 
-  @apply dark: !border-0 dark: !border-white/5 !bg-white/5;
+  @apply dark:!border-0 dark:!border-white/5 !bg-white/5;
 }
 
 .flatpickr-day.selected,
@@ -683,7 +683,7 @@ span.flatpickr-weekday,
 .flatpickr-day.endRange {
   @apply !text-white;
 
-  @apply dark: !text-white;
+  @apply dark:!text-white;
 }
 
 .flatpickr-day.selected,
@@ -774,7 +774,7 @@ span.flatpickr-weekday,
 }
 
 .fc-button-group .fc-button {
-  @apply flex h-10 w-10 items-center justify-center !rounded-lg border border-gray-200 bg-transparent active: !border-gray-200 active: !bg-transparent active: !shadow-none;
+  @apply flex h-10 w-10 items-center justify-center !rounded-lg border border-gray-200 bg-transparent active:!border-gray-200 active:!bg-transparent active:!shadow-none;
 
   &:hover {
     @apply border-gray-200 bg-gray-50;
@@ -856,14 +856,14 @@ span.flatpickr-weekday,
 .fc-theme-standard th {
   @apply !border-x-0 border-t !border-gray-200 bg-gray-50 !text-left;
 
-  @apply dark: !border-gray-800 bg-gray-900;
+  @apply dark:!border-gray-800 bg-gray-900;
 }
 
 .fc-theme-standard td,
 .fc-theme-standard .fc-scrollgrid {
   @apply !border-gray-200;
 
-  @apply dark: !border-gray-800;
+  @apply dark:!border-gray-800;
 }
 
 .fc .fc-col-header-cell-cushion {
@@ -1004,17 +1004,17 @@ span.flatpickr-weekday,
 
 .carouselTwo .swiper-button-prev,
 .carouselFour .swiper-button-prev {
-  @apply !left-3 sm: !left-4;
+  @apply !left-3 sm:!left-4;
 }
 
 .carouselTwo .swiper-button-next,
 .carouselFour .swiper-button-next {
-  @apply !right-3 sm: !right-4;
+  @apply !right-3 sm:!right-4;
 }
 
 .carouselThree .swiper-pagination,
 .carouselFour .swiper-pagination {
-  @apply !bottom-3 !left-1/2 inline-flex !w-auto -translate-x-1/2 items-center gap-1.5 rounded-[40px] border-[0.5px] border-white/10 bg-white/60 px-2 py-1.5 shadow-slider-navigation backdrop-blur-[10px] sm: !bottom-5;
+  @apply !bottom-3 !left-1/2 inline-flex !w-auto -translate-x-1/2 items-center gap-1.5 rounded-[40px] border-[0.5px] border-white/10 bg-white/60 px-2 py-1.5 shadow-slider-navigation backdrop-blur-[10px] sm:!bottom-5;
 }
 
 .carouselThree .swiper-pagination-bullet,
@@ -1074,7 +1074,7 @@ span.flatpickr-weekday,
 .simplebar-scrollbar::before {
   @apply !bg-gray-200 !rounded-full !opacity-100;
 
-  @apply dark: !bg-gray-700;
+  @apply dark:!bg-gray-700;
 }
 
 .dark .simplebar-scrollbar::before {

@@ -1,19 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router";
 
+import { CloudDrizzleIcon, Computer, LocationEditIcon, LucideLogs, SendIcon, Settings, TicketsPlaneIcon, Users2, WalletCardsIcon, WalletIcon } from "lucide-react";
 import { useSidebar } from "../context/SidebarContext";
 import {
-  BoxCubeIcon,
-  CalenderIcon,
   ChevronDownIcon,
   GridIcon,
   HorizontaLDots,
-  ListIcon,
-  PageIcon,
   PieChartIcon,
   PlugInIcon,
-  TableIcon,
-  UserCircleIcon,
+  UserCircleIcon
 } from "../icons";
 
 type NavItem = {
@@ -39,22 +35,22 @@ const navItems: NavItem[] = [
 // PAYMENTS section items
 const paymentsItems: NavItem[] = [
   {
-    icon: <PageIcon />,
+    icon: <WalletCardsIcon />,
     name: "Wallet Statement",
     path: "/wallet-statement",
   },
   {
-    icon: <TableIcon />,
+    icon: <CloudDrizzleIcon />,
     name: "Collections",
     path: "/collections",
   },
   {
-    icon: <BoxCubeIcon />,
+    icon: <SendIcon />,
     name: "Disbursements",
     path: "/disbursements",
   },
   {
-    icon: <ListIcon />,
+    icon: <TicketsPlaneIcon />,
     name: "Marketplace",
     path: "/marketplace",
   },
@@ -70,50 +66,53 @@ const paymentsItems: NavItem[] = [
   },
 ];
 
+
 // MANAGEMENT section items
 const managementItems: NavItem[] = [
   {
-    icon: <UserCircleIcon />,
+    icon: <Users2 />,
     name: "Staff",
     path: "/staff",
   },
   {
-    icon: <BoxCubeIcon />,
+    icon: <WalletIcon />,
     name: "Wallets",
     path: "/wallets",
   },
   {
-    icon: <CalenderIcon />,
+    icon: <Settings />,
     name: "Settings",
     path: "/settings",
   },
 ];
 
-// MANAGEMENT section items
-const managementItems: NavItem[] = [
+
+// SYSTEM section items
+const systemItems: NavItem[] = [
   {
-    icon: <UserCircleIcon />,
-    name: "Staff",
-    path: "/staff",
+    icon: <Computer />,
+    name: "System",
+    path: "/system",
   },
   {
-    icon: <BoxCubeIcon />,
-    name: "Wallets",
-    path: "/wallets",
+    icon: <LucideLogs />,
+    name: "Logs",
+    path: "/logs",
   },
   {
-    icon: <CalenderIcon />,
-    name: "Settings",
-    path: "/settings",
+    icon: <LocationEditIcon />,
+    name: "IP Whitelist",
+    path: "/ip-whitelist",
   },
 ];
+
 
 const AppSidebar: React.FC = () => {
   const { isExpanded, isMobileOpen } = useSidebar();
   const location = useLocation();
 
   const [openSubmenu, setOpenSubmenu] = useState<{
-    type: "main" | "payments" | "management";
+    type: "main" | "payments" | "management" | "system";
     index: number;
   } | null>(null);
   const [subMenuHeight, setSubMenuHeight] = useState<Record<string, number>>(
@@ -129,14 +128,21 @@ const AppSidebar: React.FC = () => {
 
   useEffect(() => {
     let submenuMatched = false;
-    ["main", "payments", "management"].forEach((menuType) => {
-      const items = menuType === "main" ? navItems : menuType === "payments" ? paymentsItems : managementItems;
+    ["main", "payments", "management", "system"].forEach((menuType) => {
+      const items =
+        menuType === "main"
+          ? navItems
+          : menuType === "payments"
+            ? paymentsItems
+            : menuType === "management"
+              ? managementItems
+              : systemItems;
       items.forEach((nav, index) => {
         if (nav.subItems) {
           nav.subItems.forEach((subItem) => {
             if (isActive(subItem.path)) {
               setOpenSubmenu({
-                type: menuType as "main" | "payments" | "management",
+                type: menuType as "main" | "payments" | "management" | "system",
                 index,
               });
               submenuMatched = true;
@@ -163,7 +169,10 @@ const AppSidebar: React.FC = () => {
     }
   }, [openSubmenu]);
 
-  const handleSubmenuToggle = (index: number, menuType: "main" | "payments" | "management") => {
+  const handleSubmenuToggle = (
+    index: number,
+    menuType: "main" | "payments" | "management" | "system"
+  ) => {
     setOpenSubmenu((prevOpenSubmenu) => {
       if (
         prevOpenSubmenu &&
@@ -176,7 +185,10 @@ const AppSidebar: React.FC = () => {
     });
   };
 
-  const renderMenuItems = (items: NavItem[], menuType: "main" | "payments" | "management") => (
+  const renderMenuItems = (
+    items: NavItem[],
+    menuType: "main" | "payments" | "management" | "system"
+  ) => (
     <ul className="flex flex-col gap-4">
       {items.map((nav, index) => (
         <li key={nav.name} className="relative group/tooltip">
@@ -413,6 +425,15 @@ const AppSidebar: React.FC = () => {
                 )}
               </h2>
               {renderMenuItems(managementItems, "management")}
+            </div>
+            <div className="">
+              <h2
+                className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${!isExpanded ? "lg:justify-center" : "justify-start"
+                  }`}
+              >
+                {isExpanded || isMobileOpen ? "SYSTEM" : <HorizontaLDots />}
+              </h2>
+              {renderMenuItems(systemItems, "system")}
             </div>
           </div>
         </nav>
