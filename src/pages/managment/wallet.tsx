@@ -2,17 +2,14 @@ import { ApexOptions } from "apexcharts";
 import {
     Clock,
     DollarSign,
-    Plus,
-    Send,
     TrendingDown,
-    TrendingUp,
+    TrendingUp
 } from "lucide-react";
 import { useState } from "react";
 import Chart from "react-apexcharts";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 import PageMeta from "../../components/common/PageMeta";
 import Badge from "../../components/ui/badge/Badge";
-import Button from "../../components/ui/button/Button";
 
 export default function Wallets() {
     const [selectedCurrency, setSelectedCurrency] = useState<"USD" | "UGX">("USD");

@@ -1,12 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 
+import { Menu, PanelLeftClose, PanelRightClose, SearchCheck } from 'lucide-react';
 import { Link } from "react-router";
-import { useSidebar } from "../context/SidebarContext";
 import { ThemeToggleButton } from "../components/common/ThemeToggleButton";
 import NotificationDropdown from "../components/header/NotificationDropdown";
-import UserDropdown from "../components/header/UserDropdown";
-import { Menu, PanelLeftClose, PanelRightClose, SearchCheck } from 'lucide-react';
 import FullscreenWidget from "../components/widegts/fullscreen";
+import { useSidebar } from "../context/SidebarContext";
 
 const AppHeader: React.FC = () => {
   const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false);

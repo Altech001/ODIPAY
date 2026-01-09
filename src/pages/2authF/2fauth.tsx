@@ -1,5 +1,5 @@
-import { useState, useRef, useEffect } from "react";
-import { Shield, Smartphone, QrCode, ArrowRight, CheckCircle2, ChevronLeft } from "lucide-react";
+import { ArrowRight, CheckCircle2, ChevronLeft, QrCode, Shield, Smartphone } from "lucide-react";
+import { useRef, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import PageMeta from "../../components/common/PageMeta";
 import Button from "../../components/ui/button/Button";

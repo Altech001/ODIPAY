@@ -1,13 +1,13 @@
+import { Bell, Camera, Lock, Save, Shield, User } from "lucide-react";
 import { useState } from "react";
-import { User, Bell, Shield, Mail, Phone, MapPin, Camera, Save, Lock } from "lucide-react";
+import { Link } from "react-router";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 import PageMeta from "../../components/common/PageMeta";
-import Button from "../../components/ui/button/Button";
 import Input from "../../components/form/input/InputField";
 import Label from "../../components/form/Label";
 import Avatar from "../../components/ui/avatar/Avatar";
+import Button from "../../components/ui/button/Button";
 import { useAuth } from "../../context/AuthContext";
-import { Link } from "react-router";
 
 export default function Settings() {
     const [activeTab, setActiveTab] = useState("profile");
