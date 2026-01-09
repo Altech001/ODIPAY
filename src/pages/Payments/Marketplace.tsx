@@ -3,8 +3,8 @@ import {
     Building2,
     Clock,
     Info,
-    MessageSquare,
     Search,
+    Send,
     ShieldCheck,
     Zap
 } from "lucide-react";
@@ -86,7 +86,7 @@ export default function Marketplace() {
             category: "Tools",
             description: "Instant transaction alerts and OTP management for your customers.",
             status: "available",
-            icon: <MessageSquare className="w-8 h-8" />,
+            icon: <Send className="w-8 h-8" />,
             fee: "UGX 35 / SMS",
             color: "bg-purple-600",
         },
@@ -164,7 +164,7 @@ export default function Marketplace() {
                     >
                         {/* Header: Icon & Status */}
                         <div className="flex items-start justify-between mb-6">
-                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center p-3 ${product.color} text-white  group-hover:scale-105 duration-300`}>
+                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center p-3  text-white  group-hover:scale-105 duration-300`}>
                                 {product.icon}
                             </div>
 
@@ -203,11 +203,11 @@ export default function Marketplace() {
                             </div>
 
                             {product.status === "active" ? (
-                                <Button variant="outline" size="sm" className="rounded-xl font-bold">
+                                <Button variant="outline" size="sm" className="rounded font-bold">
                                     Manage
                                 </Button>
                             ) : product.status === "available" ? (
-                                <Button variant="primary" size="sm" className="rounded-xl font-bold">
+                                <Button variant="primary" size="sm" className="rounded font-bold">
                                     Subscribe
                                 </Button>
                             ) : (

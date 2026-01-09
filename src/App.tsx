@@ -1,33 +1,34 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router";
+import { Route, BrowserRouter as Router, Routes } from "react-router";
+import { ScrollToTop } from "./components/common/ScrollToTop";
+import TwoFactorGuard from "./components/TwoFactorGuard";
+import AppLayout from "./layout/AppLayout";
+import TwoFactorAuth from "./pages/2authF/2fauth";
 import SignIn from "./pages/AuthPages/SignIn";
 import SignUp from "./pages/AuthPages/SignUp";
-import NotFound from "./pages/OtherPage/NotFound";
-import UserProfiles from "./pages/UserProfiles";
-import Badges from "./pages/UiElements/Badges";
-import Avatars from "./pages/UiElements/Avatars";
-import Buttons from "./pages/UiElements/Buttons";
-import LineChart from "./pages/Charts/LineChart";
-import BarChart from "./pages/Charts/BarChart";
-import Calendar from "./pages/Calendar";
-import BasicTables from "./pages/Tables/BasicTables";
-import FormElements from "./pages/Forms/FormElements";
 import Blank from "./pages/Blank";
-import AppLayout from "./layout/AppLayout";
-import { ScrollToTop } from "./components/common/ScrollToTop";
+import Calendar from "./pages/Calendar";
+import BarChart from "./pages/Charts/BarChart";
+import LineChart from "./pages/Charts/LineChart";
+import FormElements from "./pages/Forms/FormElements";
 import Dashboard from "./pages/Home/Dashboard";
-import Staff from "./pages/managment/staff";
-import Settings from "./pages/managment/settings";
-import TwoFactorAuth from "./pages/2authF/2fauth";
-import TwoFactorGuard from "./components/TwoFactorGuard";
-import Wallets from "./pages/managment/wallet";
-import WalletStatement from "./pages/Payments/walletstatment";
-import Beneficiaries from "./pages/Payments/Beneficaries";
 import Reports from "./pages/Home/Reports";
+import Settings from "./pages/managment/settings";
+import Staff from "./pages/managment/staff";
+import Wallets from "./pages/managment/wallet";
+import NotFound from "./pages/OtherPage/NotFound";
+import Beneficiaries from "./pages/Payments/Beneficaries";
+import Collection from "./pages/Payments/Collection";
+import Disbursements from "./pages/Payments/Disbursements";
 import Liquidation from "./pages/Payments/Liquidation";
 import Marketplace from "./pages/Payments/Marketplace";
-import Disbursements from "./pages/Payments/Disbursements";
-import Collection from "./pages/Payments/Collection";
+import WalletStatement from "./pages/Payments/walletstatment";
+import Ipwhitelist from "./pages/System/Ipwhitelist";
+import SysLogs from "./pages/System/syslogs";
+import SystemCheck from "./pages/System/systemcheck";
+import BasicTables from "./pages/Tables/BasicTables";
+import Buttons from "./pages/UiElements/Buttons";
 import Images from "./pages/UiElements/Images"; // Added import for Images
+import UserProfiles from "./pages/UserProfiles";
 
 export default function App() {
   return (
@@ -53,8 +54,8 @@ export default function App() {
 
             {/* Ui Elements */}
             <Route path="/staff" element={<Staff />} />
-            <Route path="/avatars" element={<Avatars />} />
-            <Route path="/badge" element={<Badges />} />
+            <Route path="/system" element={<SystemCheck />} />
+            <Route path="/logs" element={<SysLogs />} />
             <Route path="/buttons" element={<Buttons />} />
             <Route path="/images" element={<Images />} />
             <Route path="/settings" element={<TwoFactorGuard><Settings /></TwoFactorGuard>} />
@@ -66,6 +67,7 @@ export default function App() {
             <Route path="/marketplace" element={<Marketplace />} />
             <Route path="/disbursements" element={<Disbursements />} />
             <Route path="/collections" element={<Collection />} />
+            <Route path="/ip-whitelist" element={<Ipwhitelist />} />
 
             {/* Charts */}
             <Route path="/line-chart" element={<LineChart />} />

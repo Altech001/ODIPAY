@@ -1,9 +1,11 @@
 import {
+    ArrowDownToLine,
+    EyeClosedIcon,
     FileStack,
     Info,
     RefreshCw,
     Send,
-    Users,
+    TicketSlashIcon,
     X
 } from "lucide-react";
 import { useState } from "react";
@@ -22,25 +24,42 @@ import {
 
 export default function Disbursements() {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isInboundModalOpen, setIsInboundModalOpen] = useState(false);
     const [isBulkActive, setIsBulkActive] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
 
-    // Mock beneficiaries data for the modal
-    const beneficiaries = [
-        { id: "1", name: "Abaasa Albert", acNo: "OD10773K", provider: "MTN" },
-        { id: "2", name: "Odipay Admin", acNo: "OD99221X", provider: "Airtel" },
-        { id: "3", name: "Sarah Johnson", acNo: "OD44552Z", provider: "Bank" },
-    ];
+    // Modal Form State
+    const [phoneNumber, setPhoneNumber] = useState("");
+    const [fullName, setFullName] = useState("");
+    const [isVerifying, setIsVerifying] = useState(false);
+    const [selectedNetwork, setSelectedNetwork] = useState<"MTN" | "AIRTEL">("MTN");
 
-    const walletOptions = [
-        { value: "ODI ADMIN TEST", label: "ODI ADMIN TEST" },
-        { value: "ODI PAY MAIN", label: "ODI PAY MAIN" },
-    ];
+    const handleVerifyName = () => {
+        if (!phoneNumber) return;
+        setIsVerifying(true);
+        // Simulate API call
+        setTimeout(() => {
+            setFullName("Abaasa Albert");
+            setIsVerifying(false);
+        }, 1500);
+    };
 
-    const beneficiaryOptions = [
-        { value: "", label: "Select Beneficiary" },
-        ...beneficiaries.map(b => ({ value: b.id, label: `${b.name} (${b.acNo})` }))
-    ];
+    // Inbound Modal State
+    const [inboundAccount, setInboundAccount] = useState("");
+    const [inboundAccountName, setInboundAccountName] = useState("");
+    const [isInboundVerifying, setIsInboundVerifying] = useState(false);
+
+    const handleVerifyInboundAccount = () => {
+        if (!inboundAccount) return;
+        setIsInboundVerifying(true);
+        // Simulate API call
+        setTimeout(() => {
+            setInboundAccountName("Odipay Merchant Account");
+            setIsInboundVerifying(false);
+        }, 1500);
+    };
+
+    const amount = 5000000;
 
     return (
         <div className="space-y-6 max-w-7xl mx-auto pb-20">
@@ -68,11 +87,20 @@ export default function Disbursements() {
                     <Button
                         variant="primary"
                         size="sm"
-                        startIcon={<Send className="w-4 h-4" />}
+                        startIcon={<TicketSlashIcon className="w-4 h-4 " />}
                         onClick={() => setIsModalOpen(true)}
                     >
-                        New Payout
+                        Send Money
                     </Button>
+                    <Button
+                        variant="primary"
+                        size="sm"
+                        startIcon={<ArrowDownToLine className="w-4 h-4" />}
+                        onClick={() => setIsInboundModalOpen(true)}
+                    >
+                        Inbound CashOut
+                    </Button>
+
                 </div>
             </div>
 
@@ -86,7 +114,10 @@ export default function Disbursements() {
                     <div className="p-6 flex flex-col justify-center">
                         <div className="flex items-baseline gap-2">
                             <span className="text-xs font-bold text-gray-500">UGx</span>
-                            <span className="text-2xl font-black text-gray-900 dark:text-white">5,000.00</span>
+                            <div className="flex items-center gap-2 justify-between">
+                                <span className="text-2xl font-black text-gray-900 dark:text-white">{amount}.00</span>
+                                <EyeClosedIcon />
+                            </div>
                         </div>
                         <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mt-0.5">Available Balance</p>
                     </div>
@@ -188,11 +219,11 @@ export default function Disbursements() {
                 </Table>
             </div>
 
-            {/* New Payout Modal */}
+            {/* Inbound CashOuts Modal */}
             {isModalOpen && (
                 <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" onClick={() => setIsModalOpen(false)} />
-                    <div className="relative w-full max-w-lg bg-white dark:bg-[#1C1C1E] rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in duration-200">
+                    <div className="relative w-full max-w-lg bg-white dark:bg-[#1C1C1E] rounded shadow-2xl overflow-hidden animate-in zoom-in duration-200">
                         <div className="p-8">
                             <div className="flex items-center justify-between mb-8">
                                 <div className="flex items-center gap-3">
@@ -207,40 +238,58 @@ export default function Disbursements() {
                             </div>
 
                             <div className="space-y-6">
-                                <div className="bg-brand-50/50 dark:bg-brand-500/10 border border-brand-100 dark:border-brand-500/20 p-4 rounded-xl flex gap-3">
-                                    <Users className="w-5 h-5 text-brand-600 flex-shrink-0 mt-0.5" />
+                                <div className="space-y-6">
+                                    {/* Network Selection Cards */}
                                     <div>
-                                        <p className="text-xs font-bold text-brand-900 dark:text-brand-400 uppercase">Select from Beneficiaries</p>
-                                        <p className="text-[10px] text-brand-700 dark:text-brand-500 mt-0.5">Choose a saved beneficiary to autofill payout details.</p>
+                                        <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">Select Network</p>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div
+                                                onClick={() => setSelectedNetwork("MTN")}
+                                                className={`p-4 rounded-2xl border-2 cursor-pointer transition-all flex items-center justify-between ${selectedNetwork === "MTN" ? "border-yellow-400 bg-yellow-50 dark:bg-yellow-900/10" : "border-gray-100 dark:border-gray-800 hover:border-gray-200"}`}
+                                            >
+                                                <p className={`font-bold text-sm ${selectedNetwork === "MTN" ? "text-yellow-600" : "text-gray-500"}`}>MTN MoMo</p>
+                                                <img src="/mtnlogo.png" className="w-8 h-8 object-contain rounded" alt="MTN" />
+                                            </div>
+                                            <div
+                                                onClick={() => setSelectedNetwork("AIRTEL")}
+                                                className={`p-4 rounded-2xl border-2 cursor-pointer transition-all flex items-center justify-between ${selectedNetwork === "AIRTEL" ? "border-red-500 bg-red-50 dark:bg-red-900/10" : "border-gray-100 dark:border-gray-800 hover:border-gray-200"}`}
+                                            >
+                                                <p className={`font-bold text-sm ${selectedNetwork === "AIRTEL" ? "text-red-500" : "text-gray-500"}`}>Airtel Money</p>
+                                                <img src="/airtellogo.png" className="w-8 h-8 object-contain rounded" alt="Airtel" />
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
 
-                                <div className="relative">
-                                    <label className="absolute -top-2.5 left-3 px-1 bg-white dark:bg-[#1C1C1E] text-[11px] font-bold text-gray-400 dark:text-gray-500 z-10 uppercase tracking-widest">
-                                        Beneficiary
-                                    </label>
-                                    <Select
-                                        options={beneficiaryOptions}
-                                        onChange={() => { }}
-                                        className="h-14 border-gray-100 dark:border-gray-800 rounded-2xl pt-2"
-                                    />
-                                </div>
+                                    <div className="space-y-4">
+                                        <div className="flex items-end gap-3">
+                                            <div className="flex-1">
+                                                <Input
+                                                    placeholder="Phone Number"
+                                                    className="h-14 rounded-2xl"
+                                                    value={phoneNumber}
+                                                    onChange={(e) => setPhoneNumber(e.target.value)}
+                                                />
+                                            </div>
+                                            <Button
+                                                variant="primary"
 
-                                <div className="relative">
-                                    <label className="absolute -top-2.5 left-3 px-1 bg-white dark:bg-[#1C1C1E] text-[11px] font-bold text-gray-400 dark:text-gray-500 z-10 uppercase tracking-widest">
-                                        Source Wallet
-                                    </label>
-                                    <Select
-                                        options={walletOptions}
-                                        onChange={() => { }}
-                                        defaultValue="ODI ADMIN TEST"
-                                        className="h-14 border-gray-100 dark:border-gray-800 rounded-2xl pt-2"
-                                    />
-                                </div>
-
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <Input placeholder="Amount (UGX) *" className="h-14 rounded-2xl font-bold" />
-                                    <Input placeholder="Reference (Optional)" className="h-14 rounded-2xl" />
+                                                className="h-14 px-4 rounded-2xl"
+                                                onClick={handleVerifyName}
+                                                disabled={isVerifying || !phoneNumber}
+                                            >
+                                                {isVerifying ? <RefreshCw className="w-5 h-5 animate-spin" /> : "Verify Name"}
+                                            </Button>
+                                        </div>
+                                        <Input
+                                            placeholder="Full Name"
+                                            className="h-14 rounded-2xl"
+                                            value={fullName}
+                                            onChange={(e) => setFullName(e.target.value)}
+                                            disabled
+                                        />
+                                        <Input placeholder="Amount (UGX)" className="h-14 rounded-2xl font-bold" />
+                                        <Input placeholder="Reason for Payment" className="h-14 rounded-2xl" />
+                                    </div>
                                 </div>
 
                                 <div className="flex items-center justify-end gap-6 pt-4">
@@ -249,6 +298,70 @@ export default function Disbursements() {
                                     </button>
                                     <Button variant="primary" size="md" className="px-10 rounded-2xl shadow-lg shadow-brand-500/20">
                                         Process Payout
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Inbound CashOut Modal */}
+            {isInboundModalOpen && (
+                <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" onClick={() => setIsInboundModalOpen(false)} />
+                    <div className="relative w-full max-w-lg bg-white dark:bg-[#1C1C1E] rounded shadow-2xl overflow-hidden animate-in zoom-in duration-200">
+                        <div className="p-8">
+                            <div className="flex items-center justify-between mb-8">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 bg-brand-500 rounded-xl flex items-center justify-center">
+                                        <ArrowDownToLine className="w-5 h-5 text-white" />
+                                    </div>
+                                    <h3 className="text-xl font-bold text-gray-900 dark:text-white uppercase">Inbound CashOut</h3>
+                                </div>
+                                <button onClick={() => setIsInboundModalOpen(false)} className="text-gray-400 hover:text-gray-600">
+                                    <X className="w-6 h-6" />
+                                </button>
+                            </div>
+
+                            <div className="space-y-6">
+                                <div className="space-y-4">
+                                    <div className="flex items-end gap-3">
+                                        <div className="flex-1">
+                                            <Input
+                                                placeholder="Account Number / ID"
+                                                className="h-14 rounded-2xl"
+                                                value={inboundAccount}
+                                                onChange={(e) => setInboundAccount(e.target.value)}
+                                            />
+                                        </div>
+                                        <Button
+                                            variant="primary"
+
+                                            className="h-14 px-4 rounded-2xl"
+                                            onClick={handleVerifyInboundAccount}
+                                            disabled={isInboundVerifying || !inboundAccount}
+                                        >
+                                            {isInboundVerifying ? <RefreshCw className="w-5 h-5 animate-spin" /> : "Verify Account"}
+                                        </Button>
+                                    </div>
+                                    <Input
+                                        placeholder="Account Name"
+                                        className="h-14 rounded-2xl"
+                                        value={inboundAccountName}
+                                        onChange={(e) => setInboundAccountName(e.target.value)}
+                                        disabled
+                                    />
+                                    <Input placeholder="Amount (UGX)" className="h-14 rounded-2xl font-bold" />
+                                    <Input placeholder="Reason (Optional)" className="h-14 rounded-2xl" />
+                                </div>
+
+                                <div className="flex items-center justify-end gap-6 pt-4">
+                                    <button onClick={() => setIsInboundModalOpen(false)} className="text-sm font-bold text-gray-400 hover:text-gray-600 transition-colors">
+                                        Cancel
+                                    </button>
+                                    <Button variant="primary" size="md" className="px-10 rounded-2xl shadow-lg shadow-brand-500/20">
+                                        Transfer
                                     </Button>
                                 </div>
                             </div>

@@ -1,18 +1,20 @@
 import {
     Activity,
     DollarSign,
-    MoreVertical,
     RefreshCw,
-    Users
+    Send,
+    Users,
+    Wallet
 } from "lucide-react";
 import { useState } from "react";
 import ReactApexChart from "react-apexcharts";
 import PageMeta from "../../components/common/PageMeta";
 
 import RecentActivityTable from "../../components/dashboard/RecentActivityTable";
+import DatePicker from "../../components/form/date-picker";
 import Select from "../../components/form/Select";
+import Button from "../../components/ui/button/Button";
 
-// -- Mock Data & Chart Configs --
 
 const volumeChartOptions: any = {
     chart: {
@@ -56,7 +58,7 @@ const volumeChartOptions: any = {
 
 const volumeSeries = [{
     name: 'Infrastructure Traffic',
-    data: [150, 230, 180, 290, 210, 420, 310, 580]
+    data: [150, 530, 180, 290, 210, 420, 310, 580,]
 }];
 
 
@@ -105,10 +107,10 @@ const performanceStackedOptions: any = {
 };
 
 const performanceSeries = [
-    { name: 'Successful', data: [44, 55, 41, 67, 22, 43, 56, 41] },
-    { name: 'Pending', data: [13, 23, 20, 8, 13, 27, 33, 22] },
-    { name: 'Refunded', data: [11, 17, 15, 15, 21, 14, 15, 13] },
-    { name: 'Failed', data: [21, 7, 25, 13, 22, 8, 18, 15] }
+    { name: 'Successful', data: [44, 55, 41, 67, 22, 43, 56, 41, 65, 72, 80, 90] },
+    { name: 'Pending', data: [13, 23, 20, 8, 13, 27, 33, 22, 25, 30, 35, 40] },
+    { name: 'Refunded', data: [11, 17, 15, 15, 21, 14, 15, 13, 18, 22, 26, 30] },
+    { name: 'Failed', data: [21, 7, 25, 13, 22, 8, 18, 15, 20, 25, 30, 35] }
 ];
 
 const channelDonutOptions: any = {
@@ -116,8 +118,8 @@ const channelDonutOptions: any = {
         type: 'donut',
         fontFamily: 'Inter, sans-serif',
     },
-    colors: ['#3b82f6', '#60a5fa', '#bfdbfe'],
-    labels: ['MTN MoMo', 'Airtel Money', 'Card Payments'],
+    colors: ['yellow', 'red'],
+    labels: ['MTN MoMo', 'Airtel Money'],
     dataLabels: { enabled: false },
     plotOptions: {
         pie: {
@@ -136,7 +138,7 @@ const channelDonutOptions: any = {
                         show: true,
                         fontSize: '20px',
                         fontWeight: 800,
-                        color: '#1e293b',
+                        color: 'white',
                         offsetY: 10,
                         formatter: (val: any) => `${val}%`
                     },
@@ -160,7 +162,7 @@ const channelDonutOptions: any = {
     tooltip: { theme: 'dark' }
 };
 
-const channelSeries = [55, 30, 15];
+const channelSeries = [55, 45];
 
 // -- Components --
 
@@ -192,6 +194,9 @@ export default function Dashboard() {
         },
         tooltip: { enabled: false },
     };
+
+
+    const amount = 1000000;
 
     return (
         <div className="space-y-8 max-w-7xl mx-auto pb-20">
@@ -227,6 +232,59 @@ export default function Dashboard() {
                     </div>
                 ))}
             </div>
+            <div>
+
+                <div className="bg-white dark:bg-white/[0.03] border border-gray-100 dark:border-gray-800 rounded-xl p-8">
+                    <div className="grid grid-cols-1 md:grid-cols-[2fr_2fr_1fr] items-center gap-6">
+
+                        {/* First Column - Export Button */}
+                        <div className="flex gap-2 justify-between items-start  flex-col border-r-2 border-gray-100 dark:border-gray-800">
+                            <p className="text-sm font-semibold text-gray-500 dark:text-gray-500">Recent Transactions</p>
+                            <div className="flex gap-2 items-center justify-between">
+                                <div className="w-40">
+                                    <DatePicker id="date-from" placeholder="From Date" />
+                                </div>
+                                <div className="w-40">
+                                    <DatePicker id="date-to" placeholder="To Date" />
+                                </div>
+                            </div>
+                            <div className="flex gap-2 justify-between">
+                                <Button className="rounded-md text-gray-900 dark:text-white ">
+                                    EXPORT TO PDF
+                                </Button><Button className="rounded-md text-gray-900 dark:text-white ">
+                                    EXPORT TO CSV
+                                </Button>
+                            </div>
+                        </div>
+
+                        {/* Middle Column - Balance Info (Takes more space) */}
+                        <div className="text-left border-r-2 border-gray-100 dark:border-gray-800 min-w-0 pr-6">
+                            <p className="text-sm font-semibold text-gray-400 dark:text-gray-500">Accounts Balance</p>
+                            <p className="text-xs text-gray-600 dark:text-gray-400">Available balance for withdrawal</p>
+                            <div className="relative group mt-2">
+                                <h3 className="text-3xl font-bold text-gray-900 dark:text-white tabular-nums truncate cursor-help">
+                                    UGX {amount}.00
+                                </h3>
+                                <div className="absolute bottom-full left-0 mb-2 hidden group-hover:block z-50">
+                                    <div className="bg-gray-900 dark:bg-gray-800 text-white text-xs font-medium px-3 py-2 rounded-lg shadow-xl whitespace-nowrap">
+                                        UGX {amount}.00
+                                        <div className="absolute top-full left-6 -mt-1 border-4 border-transparent border-t-gray-900 dark:border-t-gray-800"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Last Column - Withdraw Button */}
+                        <div className="flex justify-center ">
+                            <Button className="rounded-md bg-brand-500 font-bold text-white w-full md:w-auto">
+                                <Send />
+                                Withdraw
+                            </Button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
 
             {/* Analytics Main Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -253,36 +311,17 @@ export default function Dashboard() {
                 </div>
 
                 {/* Channel Volume */}
-                <div className="bg-white dark:bg-white/[0.03] border border-gray-100 dark:border-gray-800 rounded-3xl p-8 flex flex-col shadow-sm">
+                <div className="bg-white dark:bg-white/[0.03] border border-gray-100 dark:border-gray-800 rounded-3xl p-8 flex flex-col">
                     <div className="flex items-center justify-between mb-8">
-                        <h3 className="text-lg font-black text-gray-900 dark:text-white uppercase tracking-tight">Channel Volume</h3>
+                        <h3 className="text-md font-semibold text-gray-900 dark:text-white tracking-tight">Amount CashIn & CashOut Flow</h3>
                         <button className="p-2 hover:bg-gray-50 dark:hover:bg-white/5 rounded-lg text-gray-400">
-                            <MoreVertical className="w-5 h-5" />
+                            <Wallet className="w-5 h-5" />
                         </button>
                     </div>
                     <div className="flex-1 flex flex-col justify-center">
                         <ReactApexChart options={channelDonutOptions} series={channelSeries} type="donut" height={300} />
                     </div>
-                    <div className="mt-8 space-y-3">
-                        <div className="flex items-center justify-between p-3 bg-gray-100 dark:bg-white/5 rounded-xl border border-gray-200/50 dark:border-gray-700/50">
-                            <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-lg bg-yellow-400 flex items-center justify-center p-1.5">
-                                    <img src="/mtnlogo.png" alt="MTN" className="w-full h-full object-contain" />
-                                </div>
-                                <span className="text-xs font-bold text-gray-700 dark:text-gray-300">MTN MoMo</span>
-                            </div>
-                            <span className="text-xs font-black text-gray-900 dark:text-white">55%</span>
-                        </div>
-                        <div className="flex items-center justify-between p-3 bg-gray-100 dark:bg-white/5 rounded-xl border border-gray-200/50 dark:border-gray-700/50">
-                            <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-lg bg-red-500 flex items-center justify-center p-1.5">
-                                    <img src="/airtellogo.png" alt="Airtel" className="w-full h-full object-contain" />
-                                </div>
-                                <span className="text-xs font-bold text-gray-700 dark:text-gray-300">Airtel Money</span>
-                            </div>
-                            <span className="text-xs font-black text-gray-900 dark:text-white">30%</span>
-                        </div>
-                    </div>
+
                 </div>
 
                 {/* Merchant Performance */}
