@@ -1,4 +1,4 @@
-import { Bell, Camera, Lock, Save, Shield, User } from "lucide-react";
+import { Activity, Bell, Camera, Lock, Save, Shield, User } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
@@ -17,6 +17,7 @@ export default function Settings() {
         { id: "profile", label: "Profile", icon: <User className="w-4 h-4" /> },
         { id: "notifications", label: "Notifications", icon: <Bell className="w-4 h-4" /> },
         { id: "security", label: "Security", icon: <Shield className="w-4 h-4" /> },
+        { id: "security_logs", label: "Security Logs", icon: <Activity className="w-4 h-4" /> },
     ];
 
     return (
@@ -169,6 +170,80 @@ export default function Settings() {
                                 </div>
                             </div>
                         </section>
+                    </div>
+                )}
+
+                {activeTab === "security_logs" && (
+                    <div className="p-0 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                        <div className="p-6 md:p-8 border-b border-gray-100 dark:border-gray-800">
+                            <h4 className="text-lg font-semibold text-gray-900 dark:text-white">Security Logs</h4>
+                            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                Review your recent account activity and login history.
+                            </p>
+                        </div>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left border-collapse">
+                                <thead>
+                                    <tr className="bg-gray-50 dark:bg-gray-800/50 text-xs uppercase text-gray-500 border-b border-gray-100 dark:border-gray-800">
+                                        <th className="px-6 py-4 font-semibold">Date & Time</th>
+                                        <th className="px-6 py-4 font-semibold">IP Address</th>
+                                        <th className="px-6 py-4 font-semibold">Device / User Agent</th>
+                                        <th className="px-6 py-4 font-semibold text-right">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                                    {[
+                                        { date: "Oct 24, 2023 09:41 AM", ip: "192.168.1.102", agent: "Chrome / macOS", status: "Success" },
+                                        { date: "Oct 23, 2023 11:20 PM", ip: "197.232.48.11", agent: "Safari / iOS", status: "Success" },
+                                        { date: "Oct 22, 2023 02:15 PM", ip: "41.210.158.33", agent: "Firefox / Windows", status: "Success" },
+                                        { date: "Oct 20, 2023 10:05 AM", ip: "102.210.10.5", agent: "Brave / Linux", status: "Success" },
+                                        { date: "Oct 19, 2023 08:33 PM", ip: "154.120.22.90", agent: "Chrome / Android", status: "Success" },
+                                        { date: "Oct 18, 2023 04:12 PM", ip: "196.201.21.43", agent: "Chrome / Windows", status: "Success" },
+                                        { date: "Oct 15, 2023 01:22 PM", ip: "105.100.12.3", agent: "Samsung Browser / Android", status: "Success" },
+                                        { date: "Oct 12, 2023 09:11 AM", ip: "192.168.1.102", agent: "Chrome / macOS", status: "Success" },
+                                        { date: "Oct 10, 2023 03:45 PM", ip: "197.232.0.1", agent: "Firefox / macOS", status: "Success" },
+                                        { date: "Oct 08, 2023 11:59 AM", ip: "154.67.12.8", agent: "Chrome / iOS", status: "Success" },
+                                        { date: "Oct 24, 2023 09:41 AM", ip: "192.168.1.102", agent: "Chrome / macOS", status: "Success" },
+                                        { date: "Oct 23, 2023 11:20 PM", ip: "197.232.48.11", agent: "Safari / iOS", status: "Success" },
+                                        { date: "Oct 22, 2023 02:15 PM", ip: "41.210.158.33", agent: "Firefox / Windows", status: "Success" },
+                                        { date: "Oct 20, 2023 10:05 AM", ip: "102.210.10.5", agent: "Brave / Linux", status: "Success" },
+                                        { date: "Oct 19, 2023 08:33 PM", ip: "154.120.22.90", agent: "Chrome / Android", status: "Success" },
+                                        { date: "Oct 18, 2023 04:12 PM", ip: "196.201.21.43", agent: "Chrome / Windows", status: "Success" },
+                                        { date: "Oct 15, 2023 01:22 PM", ip: "105.100.12.3", agent: "Samsung Browser / Android", status: "Success" },
+                                        { date: "Oct 12, 2023 09:11 AM", ip: "192.168.1.102", agent: "Chrome / macOS", status: "Success" },
+                                        { date: "Oct 10, 2023 03:45 PM", ip: "197.232.0.1", agent: "Firefox / macOS", status: "Success" },
+                                        { date: "Oct 08, 2023 11:59 AM", ip: "154.67.12.8", agent: "Chrome / iOS", status: "Success" },
+                                        { date: "Oct 24, 2023 09:41 AM", ip: "192.168.1.102", agent: "Chrome / macOS", status: "Success" },
+                                        { date: "Oct 23, 2023 11:20 PM", ip: "197.232.48.11", agent: "Safari / iOS", status: "Success" },
+                                        { date: "Oct 22, 2023 02:15 PM", ip: "41.210.158.33", agent: "Firefox / Windows", status: "Success" },
+                                        { date: "Oct 20, 2023 10:05 AM", ip: "102.210.10.5", agent: "Brave / Linux", status: "Success" },
+                                        { date: "Oct 19, 2023 08:33 PM", ip: "154.120.22.90", agent: "Chrome / Android", status: "Success" },
+                                        { date: "Oct 18, 2023 04:12 PM", ip: "196.201.21.43", agent: "Chrome / Windows", status: "Success" },
+                                        { date: "Oct 15, 2023 01:22 PM", ip: "105.100.12.3", agent: "Samsung Browser / Android", status: "Success" },
+                                        { date: "Oct 12, 2023 09:11 AM", ip: "192.168.1.102", agent: "Chrome / macOS", status: "Success" },
+                                        { date: "Oct 10, 2023 03:45 PM", ip: "197.232.0.1", agent: "Firefox / macOS", status: "Success" },
+                                        { date: "Oct 08, 2023 11:59 AM", ip: "154.67.12.8", agent: "Chrome / iOS", status: "Success" },
+                                    ].map((log, i) => (
+                                        <tr key={i} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors">
+                                            <td className="px-6 py-4">
+                                                <div className="text-sm font-medium text-gray-900 dark:text-white">{log.date}</div>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <div className="text-sm font-mono text-gray-500">{log.ip}</div>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <div className="text-sm text-gray-600 dark:text-gray-400">{log.agent}</div>
+                                            </td>
+                                            <td className="px-6 py-4 text-right">
+                                                <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-green-50 text-green-600 border border-green-200 dark:bg-green-500/10 dark:text-green-400 dark:border-green-500/20">
+                                                    {log.status}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 )}
             </div>

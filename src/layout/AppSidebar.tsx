@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router";
 
-import { CloudDrizzleIcon, Computer, LocationEditIcon, LucideLogs, SendIcon, Settings, TicketsPlaneIcon, Users2, WalletCardsIcon, WalletIcon } from "lucide-react";
+import { CloudDrizzleIcon, Computer, LayoutGrid, LocationEditIcon, LucideLogs, SendIcon, Settings, TicketsPlaneIcon, Users2, WalletCardsIcon, WalletIcon } from "lucide-react";
 import { useSidebar } from "../context/SidebarContext";
 import {
   ChevronDownIcon,
@@ -23,12 +23,22 @@ const navItems: NavItem[] = [
   {
     icon: <GridIcon />,
     name: "Dashboard",
-    path: "/",
+    path: "/dashboard",
+  },
+  {
+    icon: <Settings />,
+    name: "Settings",
+    path: "/settings",
   },
   {
     icon: <PieChartIcon />,
     name: "Report",
     path: "/report",
+  },
+  {
+    icon: <LayoutGrid />,
+    name: "Apps",
+    path: "/appsettings",
   },
 ];
 
@@ -325,7 +335,7 @@ const AppSidebar: React.FC = () => {
         className={`py-8 flex ${!isExpanded ? "lg:justify-center" : "justify-start"
           }`}
       >
-        <Link to="/">
+        <Link to="/dashboard">
           {isExpanded || isMobileOpen ? (
             <>
               <img

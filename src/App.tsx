@@ -10,8 +10,10 @@ import Calendar from "./pages/Calendar";
 import BarChart from "./pages/Charts/BarChart";
 import LineChart from "./pages/Charts/LineChart";
 import FormElements from "./pages/Forms/FormElements";
+import AppsViewPage from "./pages/Dashboard/Appsviewpage";
 import Dashboard from "./pages/Home/Dashboard";
 import Reports from "./pages/Home/Reports";
+import AppSettings from "./pages/Dashboard/AppSettings";
 import Settings from "./pages/managment/settings";
 import Staff from "./pages/managment/staff";
 import Wallets from "./pages/managment/wallet";
@@ -36,10 +38,15 @@ export default function App() {
       <Router>
         <ScrollToTop />
         <Routes>
+          {/* Apps View (Root) */}
+          <Route path="/" element={<AppsViewPage />} />
+
           {/* Dashboard Layout */}
           <Route element={<AppLayout />}>
-            <Route index path="/" element={<Dashboard />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/settings" element={<Settings />} />
             <Route path="/report" element={<Reports />} />
+            <Route path="/appsettings" element={<AppSettings />} />
 
             {/* Others Page */}
             <Route path="/profile" element={<UserProfiles />} />
