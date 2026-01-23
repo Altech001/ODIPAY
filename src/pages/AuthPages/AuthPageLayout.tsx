@@ -1,6 +1,5 @@
 import React from "react";
 import GridShape from "../../components/common/GridShape";
-import { Link } from "react-router";
 import ThemeTogglerTwo from "../../components/common/ThemeTogglerTwo";
 
 export default function AuthLayout({
@@ -9,31 +8,17 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="relative p-6 bg-white z-1 dark:bg-gray-900 sm:p-0">
-      <div className="relative flex flex-col justify-center w-full h-screen lg:flex-row dark:bg-gray-900 sm:p-0">
-        {children}
-        <div className="items-center hidden w-full h-full lg:w-1/2 bg-brand-950 dark:bg-white/5 lg:grid">
-          <div className="relative flex items-center justify-center z-1">
-            {/* <!-- ===== Common Grid Shape Start ===== --> */}
-            <GridShape />
-            <div className="flex flex-col items-center max-w-xs">
-              <Link to="/" className="block mb-4">
-                <img
-                  width={231}
-                  height={48}
-                  src="/images/logo/auth-logo.svg"
-                  alt="Logo"
-                />
-              </Link>
-              <p className="text-center text-gray-400 dark:text-white/60">
-                Free and Open-Source Tailwind CSS Admin Dashboard Template
-              </p>
-            </div>
-          </div>
+    <div className="relative min-h-screen w-full bg-white dark:bg-gray-900 overflow-hidden">
+      <div className="absolute inset-0 z-0">
+        <GridShape />
+      </div>
+      <div className="relative z-10 flex min-h-screen items-center justify-center p-4 sm:p-6 lg:p-8">
+        <div className="w-full max-w-lg rounded-2xl bg-white/50 px-6 py-10 backdrop-blur-md dark:bg-gray-900/50 sm:px-10 sm:py-14 border border-gray-200/50 dark:border-gray-700/50">
+          {children}
         </div>
-        <div className="fixed z-50 hidden bottom-6 right-6 sm:block">
-          <ThemeTogglerTwo />
-        </div>
+      </div>
+      <div className="fixed z-50 bottom-6 right-6">
+        <ThemeTogglerTwo />
       </div>
     </div>
   );

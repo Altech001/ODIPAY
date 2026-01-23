@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import ReactApexChart from "react-apexcharts";
+import { ApexOptions } from "apexcharts";
 import PageMeta from "../../components/common/PageMeta";
 
 import RecentActivityTable from "../../components/dashboard/RecentActivityTable";
@@ -16,7 +17,7 @@ import Select from "../../components/form/Select";
 import Button from "../../components/ui/button/Button";
 
 
-const volumeChartOptions: any = {
+const volumeChartOptions: ApexOptions = {
     chart: {
         height: 350,
         type: 'area',
@@ -63,7 +64,7 @@ const volumeSeries = [{
 
 
 
-const performanceStackedOptions: any = {
+const performanceStackedOptions: ApexOptions = {
     chart: {
         type: 'bar',
         stacked: true,
@@ -101,7 +102,7 @@ const performanceStackedOptions: any = {
         fontSize: '12px',
         fontWeight: 500,
         labels: { colors: '#94a3b8' },
-        markers: { radius: 12 }
+        markers: { shape: 'circle' }
     },
     tooltip: { theme: 'dark' }
 };
@@ -113,7 +114,7 @@ const performanceSeries = [
     { name: 'Failed', data: [21, 7, 25, 13, 22, 8, 18, 15, 20, 25, 30, 35] }
 ];
 
-const channelDonutOptions: any = {
+const channelDonutOptions: ApexOptions = {
     chart: {
         type: 'donut',
         fontFamily: 'Inter, sans-serif',
@@ -140,7 +141,7 @@ const channelDonutOptions: any = {
                         fontWeight: 800,
                         color: 'white',
                         offsetY: 10,
-                        formatter: (val: any) => `${val}%`
+                        formatter: (val: string) => `${val}%`
                     },
                     total: {
                         show: true,
@@ -156,7 +157,7 @@ const channelDonutOptions: any = {
         position: 'bottom',
         fontSize: '12px',
         labels: { colors: '#94a3b8' },
-        markers: { radius: 12 }
+        markers: { shape: 'circle' }
     },
     stroke: { show: false },
     tooltip: { theme: 'dark' }
@@ -176,7 +177,7 @@ export default function Dashboard() {
         { title: "Active Terminals", value: "1,240", change: "+7%", positive: true, icon: <Users className="w-5 h-5" />, series: [1100, 1150, 1180, 1200, 1210, 1220, 1230, 1240] },
     ];
 
-    const sparklineOptions: any = {
+    const sparklineOptions: ApexOptions = {
         chart: {
             type: 'area',
             sparkline: { enabled: true },

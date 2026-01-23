@@ -15,4 +15,13 @@ export default defineConfig({
       },
     }),
   ],
+  server: {
+    proxy: {
+      "/api": {
+        target: "https://odi-pay-server.onrender.com",
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  },
 });

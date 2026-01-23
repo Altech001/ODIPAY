@@ -1,4 +1,4 @@
-import { Route, BrowserRouter as Router, Routes } from "react-router";
+import { Route, Switch, Redirect } from "wouter";
 import { ScrollToTop } from "./components/common/ScrollToTop";
 import TwoFactorGuard from "./components/TwoFactorGuard";
 import AppLayout from "./layout/AppLayout";
@@ -29,66 +29,100 @@ import SysLogs from "./pages/System/syslogs";
 import SystemCheck from "./pages/System/systemcheck";
 import BasicTables from "./pages/Tables/BasicTables";
 import Buttons from "./pages/UiElements/Buttons";
-import Images from "./pages/UiElements/Images"; // Added import for Images
+import Images from "./pages/UiElements/Images";
 import UserProfiles from "./pages/UserProfiles";
+import { ProtectedRoute } from "./components/ProtectedRoute";
+import ErrorBoundary from "./components/ErrorBoundary";
+import { Toaster } from "sonner";
+
+
+function AppRoutes() {
+  return (
+    <Switch>
+      {/* Root redirect to Dashboard */}
+      <Route path="/">
+        <Redirect to="/applications" />
+      </Route>
+
+      {/* Auth Routes */}
+      <Route path="/auth/sign-in" component={SignIn} />
+      <Route path="/auth/sign-up" component={SignUp} />
+
+      {/* Compatibility Routes */}
+      <Route path="/signin" component={SignIn} />
+      <Route path="/signup" component={SignUp} />
+
+      {/* Protected Routes */}
+      <Route path="*">
+        <ProtectedRoute>
+          <Switch>
+            {/* Standalone Protected Pages (No Sidebar) */}
+            <Route path="/applications" component={AppsViewPage} />
+            <Route path="/setup-2fa" component={TwoFactorAuth} />
+
+            {/* Main Application with Layout */}
+            <Route path="*">
+              <AppLayout>
+                <Switch>
+                  <Route path="/dashboard" component={Dashboard} />
+                  <Route path="/settings">
+                    <TwoFactorGuard>
+                      <Settings />
+                    </TwoFactorGuard>
+                  </Route>
+                  <Route path="/report" component={Reports} />
+                  <Route path="/appsettings" component={AppSettings} />
+
+                  <Route path="/profile" component={UserProfiles} />
+                  <Route path="/calendar" component={Calendar} />
+                  <Route path="/blank" component={Blank} />
+
+                  <Route path="/form-elements" component={FormElements} />
+                  <Route path="/basic-tables" component={BasicTables} />
+
+                  <Route path="/staff" component={Staff} />
+                  <Route path="/system" component={SystemCheck} />
+                  <Route path="/logs" component={SysLogs} />
+                  <Route path="/buttons" component={Buttons} />
+                  <Route path="/images" component={Images} />
+
+                  <Route path="/wallets" component={Wallets} />
+                  <Route path="/wallet-statement" component={WalletStatement} />
+                  <Route path="/beneficiaries" component={Beneficiaries} />
+                  <Route path="/liquidations" component={Liquidation} />
+                  <Route path="/marketplace" component={Marketplace} />
+                  <Route path="/disbursements" component={Disbursements} />
+                  <Route path="/collections" component={Collection} />
+                  <Route path="/ip-whitelist" component={Ipwhitelist} />
+
+                  <Route path="/line-chart" component={LineChart} />
+                  <Route path="/bar-chart" component={BarChart} />
+
+                  {/* Root redirect to Dashboard */}
+                  <Route path="/" component={Dashboard} />
+
+                  {/* Fallback */}
+                  <Route component={NotFound} />
+                </Switch>
+              </AppLayout>
+            </Route>
+          </Switch>
+        </ProtectedRoute>
+      </Route>
+    </Switch>
+  );
+}
+
+import { AuthProvider } from "./context/AuthContext";
 
 export default function App() {
   return (
-    <>
-      <Router>
+    <ErrorBoundary>
+      <AuthProvider>
         <ScrollToTop />
-        <Routes>
-          {/* Apps View (Root) */}
-          <Route path="/" element={<AppsViewPage />} />
-
-          {/* Dashboard Layout */}
-          <Route element={<AppLayout />}>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="/report" element={<Reports />} />
-            <Route path="/appsettings" element={<AppSettings />} />
-
-            {/* Others Page */}
-            <Route path="/profile" element={<UserProfiles />} />
-            <Route path="/calendar" element={<Calendar />} />
-            <Route path="/blank" element={<Blank />} />
-
-            {/* Forms */}
-            <Route path="/form-elements" element={<FormElements />} />
-
-            {/* Tables */}
-            <Route path="/basic-tables" element={<BasicTables />} />
-
-            {/* Ui Elements */}
-            <Route path="/staff" element={<Staff />} />
-            <Route path="/system" element={<SystemCheck />} />
-            <Route path="/logs" element={<SysLogs />} />
-            <Route path="/buttons" element={<Buttons />} />
-            <Route path="/images" element={<Images />} />
-            <Route path="/settings" element={<TwoFactorGuard><Settings /></TwoFactorGuard>} />
-            <Route path="/setup-2fa" element={<TwoFactorAuth />} />
-            <Route path="/wallets" element={<Wallets />} />
-            <Route path="/wallet-statement" element={<WalletStatement />} />
-            <Route path="/beneficiaries" element={<Beneficiaries />} />
-            <Route path="/liquidations" element={<Liquidation />} />
-            <Route path="/marketplace" element={<Marketplace />} />
-            <Route path="/disbursements" element={<Disbursements />} />
-            <Route path="/collections" element={<Collection />} />
-            <Route path="/ip-whitelist" element={<Ipwhitelist />} />
-
-            {/* Charts */}
-            <Route path="/line-chart" element={<LineChart />} />
-            <Route path="/bar-chart" element={<BarChart />} />
-          </Route>
-
-          {/* Auth Layout */}
-          <Route path="/signin" element={<SignIn />} />
-          <Route path="/signup" element={<SignUp />} />
-
-          {/* Fallback Route */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Router>
-    </>
+        <Toaster position="top-right" richColors />
+        <AppRoutes />
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }

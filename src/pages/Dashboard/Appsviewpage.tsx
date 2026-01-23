@@ -1,50 +1,99 @@
-import { useNavigate, Link } from "react-router";
-import { useState } from "react";
+import { Link, useLocation } from "wouter";
+import { useState, useEffect } from "react";
 import PageMeta from "../../components/common/PageMeta";
 import Button from "../../components/ui/button/Button";
-import { Plus, LayoutGrid, Terminal, ArrowRight } from "lucide-react";
+import { Plus, LayoutGrid, Terminal, ArrowRight, Trash2, Pause, Play, Loader2 } from "lucide-react";
 import { Modal } from "../../components/ui/modal";
 import Input from "../../components/form/input/InputField";
-import UserDropdown from "../../components/header/UserDropdown";
 import { ThemeToggleButton } from "../../components/common/ThemeToggleButton";
-
-interface AppData {
-    id: string;
-    name: string;
-    email: string;
-    environment: "Sandbox" | "Live";
-    createdAt: string;
-}
+import { useAuthStore } from "../../store/authStore";
+import { useApplicationsStore } from "../../store/applicationsStore";
+import { AppCardSkeleton } from "../../components/ui/skeleton";
+import { toast } from 'sonner'
 
 export default function AppsViewPage() {
-    const navigate = useNavigate();
+    const [, setLocation] = useLocation();
+    const { user } = useAuthStore();
 
-    // Mock Data with Environment
-    const [apps, setApps] = useState<AppData[]>([
-        { id: "app_1", name: "Alpha Pay", email: "support@alphapay.com", environment: "Live", createdAt: "2024-01-15" },
-        { id: "app_2", name: "Beta Shop", email: "admin@betashop.io", environment: "Sandbox", createdAt: "2024-02-20" },
-    ]);
+    // Store integration
+    const {
+        applications,
+        isLoading,
+        fetchApplications,
+        createApplication,
+        suspendApplication,
+        activateApplication,
+        deleteApplication,
+        setCurrentApplication,
+    } = useApplicationsStore();
 
     // Modal State
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-    const [newAppName, setNewAppName] = useState("");
-    const [newAppEmail, setNewAppEmail] = useState("");
+    const [isCreating, setIsCreating] = useState(false);
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '', // Map to support email if needed, or description
+    });
 
-    // Create App Handler
-    const handleCreateApp = () => {
-        if (!newAppName || !newAppEmail) return;
-        const newApp: AppData = {
-            id: `app_${apps.length + Math.floor(Math.random() * 1000)}`,
-            name: newAppName,
-            email: newAppEmail,
-            environment: "Sandbox", // Default to Sandbox
-            createdAt: new Date().toISOString().split("T")[0],
-        };
-        setApps([...apps, newApp]);
-        setIsCreateModalOpen(false);
-        setNewAppName("");
-        setNewAppEmail("");
+    useEffect(() => {
+        fetchApplications(1, 50);
+    }, [fetchApplications]);
+
+    // Handle Create Application
+    const handleCreateApp = async () => {
+        if (!formData.name || !formData.email) return;
+        setIsCreating(true);
+
+        try {
+            const result = await createApplication({
+                name: formData.name,
+                description: `Support: ${formData.email}`,
+                rateLimit: 100,
+            });
+
+            toast.success('Application created successfully!');
+            if (result.apiKey) {
+                console.log('API Key:', result.apiKey);
+            }
+
+            setIsCreateModalOpen(false);
+            setFormData({ name: '', email: '' });
+        } catch (error) {
+            toast.error(error instanceof Error ? error.message : 'Failed to create application');
+        } finally {
+            setIsCreating(false);
+        }
     };
+
+    const handleSuspend = async (appId: string) => {
+        try {
+            await suspendApplication(appId);
+            toast.success('Application suspended');
+        } catch (error) {
+            toast.error(error instanceof Error ? error.message : 'Failed to suspend application');
+        }
+    };
+
+    const handleActivate = async (appId: string) => {
+        try {
+            await activateApplication(appId);
+            toast.success('Application activated');
+        } catch (error) {
+            toast.error(error instanceof Error ? error.message : 'Failed to activate application');
+        }
+    };
+
+    const handleDelete = async (appId: string) => {
+        if (window.confirm('Are you sure you want to delete this application?')) {
+            try {
+                await deleteApplication(appId);
+                toast.success('Application deleted');
+            } catch (error) {
+                toast.error(error instanceof Error ? error.message : 'Failed to delete application');
+            }
+        }
+    };
+
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
@@ -59,7 +108,7 @@ export default function AppsViewPage() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between">
                     {/* Left: Logo & Context */}
                     <div className="flex items-center gap-8">
-                        <Link to="/" className="flex items-center gap-2.5 group">
+                        <Link href="/" className="flex items-center gap-2.5 group">
                             <div className="w-9 h-9 rounded bg-gradient-to-br from-brand-600 to-brand-700 flex items-center justify-center text-white group-hover:scale-105 transition-transform">
                                 <Terminal className="w-5 h-5" />
                             </div>
@@ -75,13 +124,13 @@ export default function AppsViewPage() {
                     {/* Right: Actions */}
                     <div className="flex items-center gap-3 sm:gap-4">
                         <div className="hidden sm:flex items-center gap-2">
-                            <a href="#" className="text-xs font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors mr-2">
+                            <Link href="/dashboard" className="text-xs font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors mr-2">
                                 Back to Dashboard
-                            </a>
+                            </Link>
                         </div>
                         <div className="h-6 w-px bg-gray-200 dark:bg-gray-800 hidden sm:block"></div>
                         <ThemeToggleButton />
-                        <UserDropdown />
+                        {/* <UserDropdown /> */}
                     </div>
                 </div>
             </header>
@@ -93,7 +142,7 @@ export default function AppsViewPage() {
                 <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
                     <div>
                         <h1 className="text-2xl md:text-2xl font-bold text-gray-900 dark:text-white mb-3">
-                            Welcome back, Musharof
+                            Welcome back, {user?.name || 'Developer'}
                         </h1>
                         <p className="text-gray-500 dark:text-gray-400 text-base max-w-2xl">
                             Select an application to manage your payments, view analytics, and configure your integrations.
@@ -112,46 +161,79 @@ export default function AppsViewPage() {
 
                 {/* Apps Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {apps.map((app) => (
-                        <div
-                            key={app.id}
-                            className="group relative flex flex-col bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 transition-all duration-300 hover:shadow-xl hover:shadow-gray-200/50 dark:hover:shadow-black/50 hover:border-brand-500/30 hover:-translate-y-1"
-                        >
-                            <div className="flex items-start justify-between mb-6">
-                                <div className="h-14 w-14 rounded-xl border border-brand-100 dark:border-brand-500/10 flex items-center justify-center text-brand-500 group-hover:scale-105 transition-transform duration-300">
-                                    <LayoutGrid className="w-7 h-7 font-bold" />
-                                </div>
-                                <span className={`px-2.5 py-1 rounded-full text-xs font-bold border ${app.environment === "Live"
-                                    ? "bg-green-50 text-green-600 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-900/30"
-                                    : "bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-900/30"
-                                    }`}>
-                                    {app.environment}
-                                </span>
-                            </div>
-
-                            <div className="mb-6 flex-grow">
-                                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2 group-hover:text-brand-500 transition-colors">
-                                    {app.name}
-                                </h3>
-                                <div className="flex flex-col gap-1">
-                                    <div className="text-xs text-gray-400 uppercase font-semibold tracking-wider">App ID</div>
-                                    <div className="text-sm font-mono text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800/50 px-2 py-1 rounded self-start border border-gray-100 dark:border-gray-800">
-                                        {app.id}
+                    {isLoading && applications.length === 0 ? (
+                        <>
+                            <AppCardSkeleton />
+                            <AppCardSkeleton />
+                            <AppCardSkeleton />
+                        </>
+                    ) : (
+                        applications.map((app) => (
+                            <div
+                                key={app.id}
+                                className="group relative flex flex-col bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 transition-all duration-300 hover:shadow-xl hover:shadow-gray-200/50 dark:hover:shadow-black/50 hover:border-brand-500/30 hover:-translate-y-1"
+                            >
+                                <div className="flex items-start justify-between mb-6">
+                                    <div className="h-14 w-14 rounded-xl border border-brand-100 dark:border-brand-500/10 flex items-center justify-center text-brand-500 group-hover:scale-105 transition-transform duration-300">
+                                        <LayoutGrid className="w-7 h-7 font-bold" />
+                                    </div>
+                                    <div className="flex flex-col items-end gap-2">
+                                        <span className={`px-2.5 py-1 rounded-full text-xs font-bold border ${app.status === "ACTIVE"
+                                            ? "bg-green-50 text-green-600 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-900/30"
+                                            : "bg-error-50 text-error-600 border-error-200 dark:bg-error-900/20 dark:text-error-400 dark:border-error-900/30"
+                                            }`}>
+                                            {app.status}
+                                        </span>
                                     </div>
                                 </div>
-                            </div>
 
-                            <Button
-                                size="md"
-                                variant="primary"
-                                onClick={() => navigate("/dashboard")}
-                                className="w-full justify-between group/btn bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-brand-600 dark:hover:bg-brand-400 dark:hover:text-white border-0"
-                            >
-                                <span>Open Dashboard</span>
-                                <ArrowRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-1" />
-                            </Button>
-                        </div>
-                    ))}
+                                <div className="mb-6 flex-grow">
+                                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2 group-hover:text-brand-500 transition-colors">
+                                        {app.name}
+                                    </h3>
+                                    <div className="flex flex-col gap-1">
+                                        <div className="text-xs text-gray-400 uppercase font-semibold tracking-wider">App ID</div>
+                                        <div className="text-sm font-mono text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800/50 px-2 py-1 rounded self-start border border-gray-100 dark:border-gray-800">
+                                            {app.id}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center gap-2 mb-4">
+                                    <Button
+                                        size="sm"
+                                        variant="outline"
+                                        className="flex-1 !py-2"
+                                        onClick={() => app.status === 'ACTIVE' ? handleSuspend(app.id) : handleActivate(app.id)}
+                                    >
+                                        {app.status === 'ACTIVE' ? <Pause className="w-4 h-4 mr-1" /> : <Play className="w-4 h-4 mr-1" />}
+                                        {app.status === 'ACTIVE' ? 'Suspend' : 'Activate'}
+                                    </Button>
+                                    <Button
+                                        size="sm"
+                                        variant="outline"
+                                        className="!py-2 !text-error-600 !border-error-100 hover:!bg-error-50"
+                                        onClick={() => handleDelete(app.id)}
+                                    >
+                                        <Trash2 className="w-4 h-4" />
+                                    </Button>
+                                </div>
+
+                                <Button
+                                    size="md"
+                                    variant="primary"
+                                    onClick={() => {
+                                        setCurrentApplication(app);
+                                        setLocation("/dashboard");
+                                    }}
+                                    className="w-full justify-between group/btn bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-brand-600 dark:hover:bg-brand-400 dark:hover:text-white border-0"
+                                >
+                                    <span>Open Dashboard</span>
+                                    <ArrowRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-1" />
+                                </Button>
+                            </div>
+                        ))
+                    )}
 
                     {/* Quick Create Card (Optional - like Africa's Talking) */}
                     <button
@@ -195,8 +277,8 @@ export default function AppsViewPage() {
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">App Name</label>
                             <Input
                                 placeholder="e.g. My Awesome Shop"
-                                value={newAppName}
-                                onChange={(e) => setNewAppName(e.target.value)}
+                                value={formData.name}
+                                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                             />
                         </div>
                         <div>
@@ -204,8 +286,8 @@ export default function AppsViewPage() {
                             <Input
                                 placeholder="support@myapp.com"
                                 type="email"
-                                value={newAppEmail}
-                                onChange={(e) => setNewAppEmail(e.target.value)}
+                                value={formData.email}
+                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                             />
                         </div>
                     </div>
@@ -214,15 +296,17 @@ export default function AppsViewPage() {
                         <Button
                             variant="outline"
                             onClick={() => setIsCreateModalOpen(false)}
+                            disabled={isCreating}
                         >
                             Cancel
                         </Button>
                         <Button
                             variant="primary"
                             onClick={handleCreateApp}
-                            disabled={!newAppName || !newAppEmail}
+                            disabled={!formData.name || !formData.email || isCreating}
+                            startIcon={isCreating ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
                         >
-                            Create App
+                            {isCreating ? "Creating..." : "Create App"}
                         </Button>
                     </div>
                 </div>

@@ -17,12 +17,13 @@ import {
     CheckCircle2,
     Activity,
     Smartphone,
+    LucideIcon
 } from "lucide-react";
 import Button from "../../components/ui/button/Button";
 
 // --- Custom Node Component ---
 const CustomNode = ({ data }: { data: WorkflowNodeData }) => {
-    const icons: Record<string, any> = {
+    const icons: Record<string, LucideIcon> = {
         payment: Smartphone,
         gateway: Zap,
         disbursement: Send,
@@ -238,7 +239,7 @@ export default function TransactionWorkflow({ onClose, walletName }: Transaction
                             <MiniMap
                                 className="!bg-white dark:!bg-slate-800 !border-0 !shadow-xl !rounded-2xl"
                                 maskColor="rgba(0,0,0,0.1)"
-                                nodeColor={(n) => (n.data as any).isActive ? '#3751FF' : '#e2e8f0'}
+                                nodeColor={(n) => (n.data as WorkflowNodeData).isActive ? '#3751FF' : '#e2e8f0'}
                             />
                         </ReactFlow>
 

@@ -1,19 +1,59 @@
 import { useState } from "react";
-import { Link } from "react-router";
+import { Link, useLocation } from "wouter";
 import { ChevronLeftIcon, EyeCloseIcon, EyeIcon } from "../../icons";
 import Label from "../form/Label";
 import Input from "../form/input/InputField";
 import Checkbox from "../form/input/Checkbox";
 import Button from "../ui/button/Button";
+import { useAuthActions } from "../../hooks/useAuth";
+import { toast } from 'sonner';
 
 export default function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
+
+  const [, setLocation] = useLocation();
+  const { signIn } = useAuthActions();
+  const [isLoading, setIsLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+  });
+  const [error, setError] = useState<string | null>(null);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      await signIn(formData.email, formData.password);
+      toast.success("Signed in successfully!");
+
+      console.log("Signed in successfully!")
+      setLocation('/dashboard');
+    } catch (err) {
+      console.error(err);
+      toast.error((err as Error).message);
+      setError("Failed to sign in. Please check your credentials.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="flex flex-col flex-1">
-      <div className="w-full max-w-md pt-10 mx-auto">
+      <div className="w-full max-w-md mx-auto">
         <Link
-          to="/"
+          href="/"
           className="inline-flex items-center text-sm text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
         >
           <ChevronLeftIcon className="size-5" />
@@ -32,7 +72,7 @@ export default function SignInForm() {
           </div>
           <div>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-5">
-              <button className="inline-flex items-center justify-center gap-3 py-3 text-sm font-normal text-gray-700 transition-colors bg-gray-100 rounded-lg px-7 hover:bg-gray-200 hover:text-gray-800 dark:bg-white/5 dark:text-white/90 dark:hover:bg-white/10">
+              <button disabled={isLoading} className="inline-flex items-center justify-center gap-3 py-3 text-sm font-normal text-gray-700 transition-colors bg-gray-100 rounded-lg px-7 hover:bg-gray-200 hover:text-gray-800 dark:bg-white/5 dark:text-white/90 dark:hover:bg-white/10">
                 <svg
                   width="20"
                   height="20"
@@ -57,7 +97,7 @@ export default function SignInForm() {
                     fill="#EB4335"
                   />
                 </svg>
-                Sign in with Google
+                Google
               </button>
               <button className="inline-flex items-center justify-center gap-3 py-3 text-sm font-normal text-gray-700 transition-colors bg-gray-100 rounded-lg px-7 hover:bg-gray-200 hover:text-gray-800 dark:bg-white/5 dark:text-white/90 dark:hover:bg-white/10">
                 <svg
@@ -70,7 +110,6 @@ export default function SignInForm() {
                 >
                   <path d="M15.6705 1.875H18.4272L12.4047 8.75833L19.4897 18.125H13.9422L9.59717 12.4442L4.62554 18.125H1.86721L8.30887 10.7625L1.51221 1.875H7.20054L11.128 7.0675L15.6705 1.875ZM14.703 16.475H16.2305L6.37054 3.43833H4.73137L14.703 16.475Z" />
                 </svg>
-                Sign in with X
               </button>
             </div>
             <div className="relative py-3 sm:py-5">
@@ -83,13 +122,23 @@ export default function SignInForm() {
                 </span>
               </div>
             </div>
-            <form>
+            <form onSubmit={handleSubmit}>
               <div className="space-y-6">
+                {error && (
+                  <div className="p-3 text-sm text-error-500 bg-error-50 dark:bg-error-900/10 rounded-lg">
+                    {error}
+                  </div>
+                )}
                 <div>
                   <Label>
                     Email <span className="text-error-500">*</span>{" "}
                   </Label>
-                  <Input placeholder="info@gmail.com" />
+                  <Input
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    placeholder="info@gmail.com"
+                  />
                 </div>
                 <div>
                   <Label>
@@ -97,6 +146,9 @@ export default function SignInForm() {
                   </Label>
                   <div className="relative">
                     <Input
+                      name="password"
+                      value={formData.password}
+                      onChange={handleChange}
                       type={showPassword ? "text" : "password"}
                       placeholder="Enter your password"
                     />
@@ -120,15 +172,15 @@ export default function SignInForm() {
                     </span>
                   </div>
                   <Link
-                    to="/reset-password"
+                    href="/reset-password"
                     className="text-sm text-brand-500 hover:text-brand-600 dark:text-brand-400"
                   >
                     Forgot password?
                   </Link>
                 </div>
                 <div>
-                  <Button className="w-full" size="sm">
-                    Sign in
+                  <Button className="w-full" size="sm" type="submit" disabled={isLoading}>
+                    {isLoading ? "Signing In..." : "Sign in"}
                   </Button>
                 </div>
               </div>
@@ -138,7 +190,7 @@ export default function SignInForm() {
               <p className="text-sm font-normal text-center text-gray-700 dark:text-gray-400 sm:text-start">
                 Don&apos;t have an account? {""}
                 <Link
-                  to="/signup"
+                  href="/auth/sign-up"
                   className="text-brand-500 hover:text-brand-600 dark:text-brand-400"
                 >
                   Sign Up
@@ -151,3 +203,4 @@ export default function SignInForm() {
     </div>
   );
 }
+

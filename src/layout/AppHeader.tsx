@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
 import { Menu, PanelLeftClose, PanelRightClose, SearchCheck } from 'lucide-react';
-import { Link } from "react-router";
+import { Link } from "wouter";
 import { ThemeToggleButton } from "../components/common/ThemeToggleButton";
 import NotificationDropdown from "../components/header/NotificationDropdown";
 import FullscreenWidget from "../components/widegts/fullscreen";
@@ -57,15 +57,15 @@ const AppHeader: React.FC = () => {
             )}
           </button>
 
-          <Link to="/" className="lg:hidden">
+          <Link href="/" className="lg:hidden">
             <img
               className="dark:hidden"
-              src="./images/logo/logo.svg"
+              src="./images/logo/logo-icon.svg"
               alt="Logo"
             />
             <img
               className="hidden dark:block"
-              src="./images/logo/logo-dark.svg"
+              src="./images/logo/logo-icon.svg"
               alt="Logo"
             />
           </Link>
@@ -110,7 +110,7 @@ const AppHeader: React.FC = () => {
             <NotificationDropdown />
             {/* <!-- Notification Menu Area --> */}
           </div>
-          
+
         </div>
       </div>
     </header>

@@ -1,4 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { toast } from "sonner";
+import { useApplicationsStore } from "../../store/applicationsStore";
+import { Redirect } from "wouter";
+
 import PageMeta from "../../components/common/PageMeta";
 import Button from "../../components/ui/button/Button";
 import Input from "../../components/form/input/InputField";
@@ -24,27 +28,88 @@ interface TeamMember {
 }
 
 export default function AppSettings() {
-    // Mock Data
-    const [appName, setAppName] = useState("Alpha Pay");
-    const [supportEmail, setSupportEmail] = useState("support@alphapay.com");
-    const [webhookUrl, setWebhookUrl] = useState("https://api.alphapay.com/webhooks/odipay");
+    const { currentApplication, updateApplication, deleteApplication, rotateApiKey, isLoading } = useApplicationsStore();
 
-    // API Keys (Mock)
-    const [livePublicKey] = useState("pk_live_8392048203948209348");
-    const [liveSecretKey] = useState("sk_live_********************");
+    // State for general info
+    const [appName, setAppName] = useState("");
+    const [supportEmail, setSupportEmail] = useState("");
+    const [webhookUrl, setWebhookUrl] = useState("");
+
+    // Secret Key state
+    const [liveSecretKey, setLiveSecretKey] = useState("sk_live_********************");
     const [showSecret, setShowSecret] = useState(false);
+    const [isRotating, setIsRotating] = useState(false);
 
-    // Team Members
-    const [teamMembers] = useState<TeamMember[]>([
-        { id: "1", name: "Musharof Chy", email: "musharof@example.com", role: "Owner", avatar: "/images/user/owner.jpg" },
-        { id: "2", name: "Naimur Rahman", email: "naimur@example.com", role: "Developer" },
-    ]);
-
+    // Team Members (Empty for now as backend doesn't support it yet)
+    const [teamMembers] = useState<TeamMember[]>([]);
     const [inviteEmail, setInviteEmail] = useState("");
 
+    useEffect(() => {
+        if (currentApplication) {
+            setAppName(currentApplication.name);
+            // In our system, support email is currently stored in description
+            const emailMatch = currentApplication.description?.match(/Support: (.*)/);
+            setSupportEmail(emailMatch ? emailMatch[1] : (currentApplication.description || ""));
+            setWebhookUrl(currentApplication.webhookUrl || "");
+        }
+    }, [currentApplication]);
+
+    if (!currentApplication) {
+        return <Redirect to="/applications" />;
+    }
+
     const handleCopy = (text: string) => {
+        if (!text) return;
         navigator.clipboard.writeText(text);
-        // Toast notification would go here
+        toast.success("Copied to clipboard");
+    };
+
+    const handleUpdateGeneral = async () => {
+        try {
+            await updateApplication(currentApplication.id, {
+                name: appName,
+                description: `Support: ${supportEmail}`,
+            });
+            toast.success("Application settings updated");
+        } catch {
+            toast.error("Failed to update settings");
+        }
+    };
+
+    const handleUpdateWebhook = async () => {
+        try {
+            await updateApplication(currentApplication.id, {
+                webhookUrl: webhookUrl,
+            });
+            toast.success("Webhook URL updated");
+        } catch {
+            toast.error("Failed to update webhook");
+        }
+    };
+
+    const handleRotateKey = async () => {
+        if (!window.confirm("Are you sure you want to rotate your API key? All current integrations will break.")) return;
+        setIsRotating(true);
+        try {
+            const newKey = await rotateApiKey(currentApplication.id);
+            setLiveSecretKey(newKey);
+            setShowSecret(true);
+            toast.success("API key regenerated");
+        } catch {
+            toast.error("Failed to regenerate API key");
+        } finally {
+            setIsRotating(false);
+        }
+    };
+
+    const handleDeleteApp = async () => {
+        if (!window.confirm(`Are you absolutely sure you want to delete ${currentApplication.name}? This action cannot be undone.`)) return;
+        try {
+            await deleteApplication(currentApplication.id);
+            toast.success("Application deleted");
+        } catch {
+            toast.error("Failed to delete application");
+        }
     };
 
     return (
@@ -93,8 +158,12 @@ export default function AppSettings() {
                 </div>
 
                 <div className="mt-6 pt-6 border-t border-gray-100 dark:border-gray-800 flex justify-end">
-                    <Button startIcon={<Save className="w-4 h-4" />}>
-                        Save Changes
+                    <Button
+                        startIcon={<Save className="w-4 h-4" />}
+                        onClick={handleUpdateGeneral}
+                        disabled={isLoading}
+                    >
+                        {isLoading ? "Saving..." : "Save Changes"}
                     </Button>
                 </div>
             </div>
@@ -110,14 +179,14 @@ export default function AppSettings() {
 
                 <div className="space-y-6 max-w-3xl">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Live Public Key</label>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Live Public Key (App ID)</label>
                         <div className="flex gap-2">
                             <Input
-                                value={livePublicKey}
+                                value={currentApplication.id}
                                 disabled
                                 className="font-mono text-sm bg-gray-50 dark:bg-gray-800/50"
                             />
-                            <Button variant="outline" size="sm" onClick={() => handleCopy(livePublicKey)}>
+                            <Button variant="outline" size="sm" onClick={() => handleCopy(currentApplication.id)}>
                                 <Copy className="w-4 h-4" />
                             </Button>
                         </div>
@@ -127,19 +196,25 @@ export default function AppSettings() {
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Live Secret Key</label>
                         <div className="flex gap-2">
                             <Input
-                                value={showSecret ? "sk_live_8392048203948209348_SECRET" : liveSecretKey}
-                                type={showSecret ? "text" : "password"}
+                                value={liveSecretKey}
+                                type={(showSecret || liveSecretKey.startsWith('sk_')) ? "text" : "password"}
                                 disabled
                                 className="font-mono text-sm bg-gray-50 dark:bg-gray-800/50"
                             />
                             <Button variant="outline" size="sm" onClick={() => setShowSecret(!showSecret)}>
                                 {showSecret ? "Hide" : "Show"}
                             </Button>
-                            <Button variant="outline" size="sm" onClick={() => handleCopy("sk_live_8392048203948209348_SECRET")}>
+                            <Button variant="outline" size="sm" onClick={() => handleCopy(liveSecretKey)}>
                                 <Copy className="w-4 h-4" />
                             </Button>
-                            <Button variant="outline" size="sm" className="text-amber-600 border-amber-200 hover:bg-amber-50">
-                                <RotateCw className="w-4 h-4" />
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                className="text-amber-600 border-amber-200 hover:bg-amber-50"
+                                onClick={handleRotateKey}
+                                disabled={isRotating}
+                            >
+                                <RotateCw className={`w-4 h-4 ${isRotating ? 'animate-spin' : ''}`} />
                             </Button>
                         </div>
                         <p className="mt-1.5 text-xs text-amber-600 flex items-center gap-1">
@@ -156,7 +231,12 @@ export default function AppSettings() {
                                 onChange={(e) => setWebhookUrl(e.target.value)}
                                 placeholder="https://your-domain.com/webhook"
                             />
-                            <Button>Update</Button>
+                            <Button
+                                onClick={handleUpdateWebhook}
+                                disabled={isLoading}
+                            >
+                                {isLoading ? "Updating..." : "Update"}
+                            </Button>
                         </div>
                     </div>
                 </div>
@@ -182,7 +262,14 @@ export default function AppSettings() {
                             onChange={(e) => setInviteEmail(e.target.value)}
                             className="min-w-[200px]"
                         />
-                        <Button startIcon={<UserPlus className="w-4 h-4" />} disabled={!inviteEmail}>
+                        <Button
+                            startIcon={<UserPlus className="w-4 h-4" />}
+                            disabled={!inviteEmail}
+                            onClick={() => {
+                                toast.success(`Invitation sent to ${inviteEmail}`);
+                                setInviteEmail("");
+                            }}
+                        >
                             Invite
                         </Button>
                     </div>
@@ -198,42 +285,50 @@ export default function AppSettings() {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-                            {teamMembers.map((member) => (
-                                <tr key={member.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors">
-                                    <td className="px-5 py-3">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-9 h-9 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center overflow-hidden">
-                                                {member.avatar ? (
-                                                    <img src={member.avatar} alt={member.name} className="w-full h-full object-cover" />
-                                                ) : (
-                                                    <span className="text-xs font-bold text-gray-500 dark:text-gray-400">
-                                                        {member.name.charAt(0)}
-                                                    </span>
-                                                )}
+                            {teamMembers.length > 0 ? (
+                                teamMembers.map((member) => (
+                                    <tr key={member.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors">
+                                        <td className="px-5 py-3">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-9 h-9 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center overflow-hidden">
+                                                    {member.avatar ? (
+                                                        <img src={member.avatar} alt={member.name} className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <span className="text-xs font-bold text-gray-500 dark:text-gray-400">
+                                                            {member.name.charAt(0)}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <div>
+                                                    <div className="text-sm font-medium text-gray-900 dark:text-white">{member.name}</div>
+                                                    <div className="text-xs text-gray-500">{member.email}</div>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <div className="text-sm font-medium text-gray-900 dark:text-white">{member.name}</div>
-                                                <div className="text-xs text-gray-500">{member.email}</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td className="px-5 py-3">
-                                        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border ${member.role === 'Owner'
-                                            ? 'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-900/20 dark:text-purple-400 dark:border-purple-900/30'
-                                            : 'bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700'
-                                            }`}>
-                                            {member.role}
-                                        </span>
-                                    </td>
-                                    <td className="px-5 py-3 text-right">
-                                        {member.role !== 'Owner' && (
-                                            <button className="text-gray-400 hover:text-error-500 transition-colors p-1">
-                                                <Trash2 className="w-4 h-4" />
-                                            </button>
-                                        )}
+                                        </td>
+                                        <td className="px-5 py-3">
+                                            <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border ${member.role === 'Owner'
+                                                ? 'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-900/20 dark:text-purple-400 dark:border-purple-900/30'
+                                                : 'bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700'
+                                                }`}>
+                                                {member.role}
+                                            </span>
+                                        </td>
+                                        <td className="px-5 py-3 text-right">
+                                            {member.role !== 'Owner' && (
+                                                <button className="text-gray-400 hover:text-error-500 transition-colors p-1">
+                                                    <Trash2 className="w-4 h-4" />
+                                                </button>
+                                            )}
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan={3} className="px-5 py-8 text-center text-sm text-gray-500">
+                                        No team members found. Invite someone to collaborate.
                                     </td>
                                 </tr>
-                            ))}
+                            )}
                         </tbody>
                     </table>
                 </div>
@@ -258,8 +353,10 @@ export default function AppSettings() {
                     <Button
                         variant="outline"
                         className="!border-error-200 !text-error-600 hover:!bg-error-50 dark:!border-error-900 dark:!text-error-400 dark:hover:!bg-error-900/20 whitespace-nowrap"
+                        onClick={handleDeleteApp}
+                        disabled={isLoading}
                     >
-                        Delete App
+                        {isLoading ? "Deleting..." : "Delete App"}
                     </Button>
                 </div>
             </div>

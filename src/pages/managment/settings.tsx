@@ -1,6 +1,6 @@
 import { Activity, Bell, Camera, Lock, Save, Shield, User } from "lucide-react";
 import { useState } from "react";
-import { Link } from "react-router";
+import { Link } from "wouter";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 import PageMeta from "../../components/common/PageMeta";
 import Input from "../../components/form/input/InputField";
@@ -158,7 +158,7 @@ export default function Settings() {
                                             : "Add an extra layer of security to your account by enabling 2FA."}
                                     </p>
                                     {!is2FAEnabled && (
-                                        <Link to="/setup-2fa" className="mt-3 inline-block text-sm font-bold text-orange-600 hover:text-orange-700 dark:text-orange-400">
+                                        <Link href="/setup-2fa" className="mt-3 inline-block text-sm font-bold text-orange-600 hover:text-orange-700 dark:text-orange-400">
                                             Setup 2FA →
                                         </Link>
                                     )}

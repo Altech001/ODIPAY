@@ -5,14 +5,67 @@ import {
     TrendingDown,
     TrendingUp
 } from "lucide-react";
-import { useState } from "react";
-import Chart from "react-apexcharts";
+import { useState, useEffect } from "react";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 import PageMeta from "../../components/common/PageMeta";
 import Badge from "../../components/ui/badge/Badge";
+import { useWalletsStore } from "../../store/walletsStore";
+import { toast } from "sonner";
+import { Modal } from "../../components/ui/modal";
+import Button from "../../components/ui/button/Button";
+import Select from "../../components/form/Select";
+import { Plus } from "lucide-react";
+import Chart from "react-apexcharts";
 
 export default function Wallets() {
-    const [selectedCurrency, setSelectedCurrency] = useState<"USD" | "UGX">("USD");
+    const { wallets, isLoading, fetchWallets, currentWallet, setCurrentWallet, createWallet } = useWalletsStore();
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [isCreating, setIsCreating] = useState(false);
+    const [newCurrency, setNewCurrency] = useState('UGX');
+
+    useEffect(() => {
+        fetchWallets();
+    }, [fetchWallets]);
+
+    const handleCreateWallet = async () => {
+        setIsCreating(true);
+        try {
+            await createWallet(newCurrency);
+            toast.success(`${newCurrency} wallet created successfully!`);
+            setIsDialogOpen(false);
+        } catch (error) {
+            toast.error(error instanceof Error ? error.message : 'Failed to create wallet');
+        } finally {
+            setIsCreating(false);
+        }
+    };
+
+    const overviewMetrics = currentWallet ? [
+        {
+            title: "Available Balance",
+            value: `${currentWallet.currency} ${parseFloat(currentWallet.balance.availableBalance).toLocaleString()}`,
+            change: "+0.0%",
+            isPositive: true,
+            icon: <DollarSign className="w-5 h-5 text-brand-500" />,
+            sparkData: [0, 0, 0, 0, 0, 0, 0, 0]
+        },
+        {
+            title: "Pending Balance",
+            value: `${currentWallet.currency} ${parseFloat(currentWallet.balance.pendingBalance).toLocaleString()}`,
+            change: "0.0%",
+            isPositive: true,
+            icon: <Clock className="w-5 h-5 text-warning-500" />,
+            sparkData: [0, 0, 0, 0, 0, 0, 0, 0]
+        },
+        {
+            title: "Total Balance",
+            value: `${currentWallet.currency} ${parseFloat(currentWallet.balance.totalBalance).toLocaleString()}`,
+            change: "+0.0%",
+            isPositive: true,
+            icon: <TrendingUp className="w-5 h-5 text-success-500" />,
+            sparkData: [0, 0, 0, 0, 0, 0, 0, 0]
+        },
+    ] : [];
 
     const chartOptions: ApexOptions = {
         legend: { show: false },
@@ -50,17 +103,17 @@ export default function Wallets() {
 
     const chartSeries = [
         {
-            name: "Collections",
-            data: [310, 400, 280, 510, 420, 109, 100, 120],
+            name: "Inflow",
+            data: [0, 0, 0, 0, 0, 0, 0, 0],
         },
         {
-            name: "Disbursements",
-            data: [110, 320, 450, 320, 340, 520, 410, 480],
+            name: "Outflow",
+            data: [0, 0, 0, 0, 0, 0, 0, 0],
         },
     ];
 
     const Sparkline = ({ data, color }: { data: number[], color: string }) => (
-        <div className="h-12 w-24">
+        <div className="h-12 w-24 opacity-20">
             <Chart
                 options={{
                     chart: { type: 'area', sparkline: { enabled: true }, animations: { enabled: true } },
@@ -80,41 +133,6 @@ export default function Wallets() {
         </div>
     );
 
-    const overviewMetrics = [
-        {
-            title: "Available Balance",
-            value: selectedCurrency === "USD" ? "$128,430.00" : "UGX 475,200,000",
-            change: "+2.5%",
-            isPositive: true,
-            icon: <DollarSign className="w-5 h-5 text-brand-500" />,
-            sparkData: [30, 40, 35, 50, 49, 60, 70, 91]
-        },
-        {
-            title: "Total Collections",
-            value: selectedCurrency === "USD" ? "$45,200.00" : "UGX 167,240,000",
-            change: "+9.5%",
-            isPositive: true,
-            icon: <TrendingUp className="w-5 h-5 text-success-500" />,
-            sparkData: [20, 35, 40, 30, 45, 65, 55, 80]
-        },
-        {
-            title: "Total Disbursements",
-            value: selectedCurrency === "USD" ? "$28,450.00" : "UGX 105,265,000",
-            change: "-1.6%",
-            isPositive: false,
-            icon: <TrendingDown className="w-5 h-5 text-error-500" />,
-            sparkData: [80, 70, 65, 85, 50, 40, 45, 30]
-        },
-        {
-            title: "Pending Payouts",
-            value: selectedCurrency === "USD" ? "$12,300.00" : "UGX 45,510,000",
-            change: "+3.5%",
-            isPositive: true,
-            icon: <Clock className="w-5 h-5 text-warning-500" />,
-            sparkData: [25, 44, 30, 55, 60, 45, 70, 65]
-        },
-    ];
-
 
     return (
         <div className="space-y-6 max-w-7xl mx-auto">
@@ -124,27 +142,32 @@ export default function Wallets() {
             {/* Currency Switcher & Actions */}
             <div className="flex flex-wrap items-center justify-between gap-4">
                 <div className="flex p-1.5 border border-gray-200 bg-white/50 backdrop-blur-sm rounded-2xl dark:border-gray-800 dark:bg-white/[0.03]">
-                    <button
-                        onClick={() => setSelectedCurrency("USD")}
-                        className={`px-6 py-2 rounded-xl text-sm font-medium transition-all ${selectedCurrency === "USD"
-                            ? "bg-white text-brand-600 shadow-sm dark:bg-gray-800 dark:text-white"
-                            : "text-gray-500 hover:text-gray-700 dark:text-gray-400"
-                            }`}
-                    >
-                        USD Wallet
-                    </button>
-                    <button
-                        onClick={() => setSelectedCurrency("UGX")}
-                        className={`px-6 py-2 rounded-xl text-sm font-medium transition-all ${selectedCurrency === "UGX"
-                            ? "bg-white text-brand-600 shadow-sm dark:bg-gray-800 dark:text-white"
-                            : "text-gray-500 hover:text-gray-700 dark:text-gray-400"
-                            }`}
-                    >
-                        UGX Wallet
-                    </button>
+                    {wallets.map((wallet) => (
+                        <button
+                            key={wallet.id}
+                            onClick={() => setCurrentWallet(wallet)}
+                            className={`px-6 py-2 rounded-xl text-sm font-medium transition-all ${currentWallet?.id === wallet.id
+                                ? "bg-white text-brand-600 shadow-sm dark:bg-gray-800 dark:text-white"
+                                : "text-gray-500 hover:text-gray-700 dark:text-gray-400"
+                                }`}
+                        >
+                            {wallet.currency} Wallet
+                        </button>
+                    ))}
+                    {wallets.length === 0 && !isLoading && (
+                        <span className="px-6 py-2 text-sm text-gray-500 italic">No wallets found</span>
+                    )}
                 </div>
 
                 <div className="flex items-center gap-3">
+                    <Button
+                        variant="primary"
+                        size="sm"
+                        startIcon={<Plus className="w-4 h-4" />}
+                        onClick={() => setIsDialogOpen(true)}
+                    >
+                        New Wallet
+                    </Button>
                     {[
                         { name: "MTN Money", logo: "/mtnlogo.png", in: "$45.2k", out: "$28.4k" },
                         { name: "Airtel Money", logo: "/airtellogo.png", in: "$32.1k", out: "$19.8k" }
@@ -173,7 +196,7 @@ export default function Wallets() {
             </div>
 
             {/* Overview Section - Inspired by Image 1 */}
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {overviewMetrics.map((metric, index) => (
                     <div key={index} className="p-5 border border-gray-200 bg-white rounded-2xl dark:border-gray-800 dark:bg-white/[0.03] ">
                         <div className="flex items-start justify-between mb-4">
@@ -203,6 +226,11 @@ export default function Wallets() {
                         </div>
                     </div>
                 ))}
+                {wallets.length === 0 && !isLoading && (
+                    <div className="col-span-full p-10 text-center border border-dashed border-gray-200 dark:border-gray-800 rounded-3xl">
+                        <p className="text-gray-500">Create your first wallet to see balance metrics</p>
+                    </div>
+                )}
             </div>
 
             {/* Main Content Grid - Inspired by Image 2 */}
@@ -327,6 +355,57 @@ export default function Wallets() {
                     </div>
                 </div>
             </div>
+
+            {/* Create Wallet Modal */}
+            <Modal isOpen={isDialogOpen} onClose={() => setIsDialogOpen(false)} className="max-w-md">
+                <div className="p-8">
+                    <div className="flex items-center gap-3 mb-6">
+                        <div className="p-3 bg-brand-50 dark:bg-brand-900/20 rounded-2xl text-brand-600">
+                            <Plus className="w-6 h-6" />
+                        </div>
+                        <div>
+                            <h3 className="text-xl font-bold text-gray-900 dark:text-white">New Currency Wallet</h3>
+                            <p className="text-sm text-gray-500">Activate a wallet in a different currency.</p>
+                        </div>
+                    </div>
+
+                    <div className="space-y-6">
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                                Currency
+                            </label>
+                            <Select
+                                value={newCurrency}
+                                options={[
+                                    { value: 'UGX', label: 'UGX - Ugandan Shilling' },
+                                    { value: 'KES', label: 'KES - Kenyan Shilling' },
+                                    { value: 'USD', label: 'USD - US Dollar' },
+                                ]}
+                                onChange={setNewCurrency}
+                            />
+                        </div>
+
+                        <div className="flex items-center gap-3 pt-2">
+                            <Button
+                                variant="outline"
+                                className="flex-1"
+                                onClick={() => setIsDialogOpen(false)}
+                                disabled={isCreating}
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                variant="primary"
+                                className="flex-1"
+                                onClick={handleCreateWallet}
+                                disabled={isCreating}
+                            >
+                                {isCreating ? "Creating..." : "Create Wallet"}
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            </Modal>
         </div>
     );
 }

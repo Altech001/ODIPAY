@@ -1,10 +1,15 @@
 import { useState } from "react";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
 import { Dropdown } from "../ui/dropdown/Dropdown";
-import { Link } from "react-router";
+import { useLocation } from "wouter";
+import { useAuthStore } from "../../store/authStore";
+import { toast } from "sonner";
 
 export default function UserDropdown() {
   const [isOpen, setIsOpen] = useState(false);
+
+  const { user, signOut } = useAuthStore();
+  const [, setLocation] = useLocation();
 
   function toggleDropdown() {
     setIsOpen(!isOpen);
@@ -13,21 +18,39 @@ export default function UserDropdown() {
   function closeDropdown() {
     setIsOpen(false);
   }
+
+  const handleSignOut = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    try {
+      await signOut();
+      closeDropdown();
+      setLocation("/auth/sign-in");
+      toast.success("Successfully signed out");
+    } catch (error) {
+      toast.error("Failed to sign out");
+      console.error(error);
+    }
+  };
   return (
     <div className="relative">
       <button
         onClick={toggleDropdown}
         className="flex items-center text-gray-700 dropdown-toggle dark:text-gray-400"
       >
-        <span className="mr-3 overflow-hidden rounded-full h-11 w-11">
-          <img src="/images/user/owner.jpg" alt="User" />
+        <span className="mr-3 overflow-hidden rounded-full h-11 w-11 bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+          {user?.image ? (
+            <img src={user.image} alt={user.name || "User"} className="h-full w-full object-cover" />
+          ) : (
+            <span className="text-sm font-bold text-brand-600 dark:text-brand-400">
+              {user?.name?.charAt(0) || user?.email?.charAt(0) || "U"}
+            </span>
+          )}
         </span>
 
-        
+
         <svg
-          className={`stroke-gray-500 dark:stroke-gray-400 transition-transform duration-200 ${
-            isOpen ? "rotate-180" : ""
-          }`}
+          className={`stroke-gray-500 dark:stroke-gray-400 transition-transform duration-200 ${isOpen ? "rotate-180" : ""
+            }`}
           width="18"
           height="20"
           viewBox="0 0 18 20"
@@ -51,10 +74,10 @@ export default function UserDropdown() {
       >
         <div>
           <span className="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">
-            Musharof Chowdhury
+            {user?.name || "User"}
           </span>
           <span className="mt-0.5 block text-theme-xs text-gray-500 dark:text-gray-400">
-            randomuser@pimjo.com
+            {user?.email || "No email provided"}
           </span>
         </div>
 
@@ -135,9 +158,9 @@ export default function UserDropdown() {
             </DropdownItem>
           </li>
         </ul>
-        <Link
-          to="/signin"
-          className="flex items-center gap-3 px-3 py-2 mt-3 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
+        <button
+          onClick={handleSignOut}
+          className="flex w-full items-center gap-3 px-3 py-2 mt-3 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
         >
           <svg
             className="fill-gray-500 group-hover:fill-gray-700 dark:group-hover:fill-gray-300"
@@ -155,7 +178,7 @@ export default function UserDropdown() {
             />
           </svg>
           Sign out
-        </Link>
+        </button>
       </Dropdown>
     </div>
   );

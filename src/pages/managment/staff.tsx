@@ -14,49 +14,24 @@ import {
 import Select from "../../components/form/Select";
 
 export default function Staff() {
-    const staffData = [
-        {
-            id: 1,
-            name: "ABAASA ALBERT",
-            email: "albertabaasa07@gmail.com",
-            status: "Active",
-            initials: "AA",
-        },
-        {
-            id: 2,
-            name: "JANE DOE",
-            email: "jane.doe@example.com",
-            status: "Active",
-            initials: "JD",
-        },
-        {
-            id: 3,
-            name: "JOHN SMITH",
-            email: "john.smith@odipay.com",
-            status: "Inactive",
-            initials: "JS",
-        },
-        {
-            id: 4,
-            name: "SARAH CONNOR",
-            email: "s.connor@sky.net",
-            status: "Active",
-            initials: "SC",
-        },
-    ];
     const [searchTerm, setSearchTerm] = useState("");
     const [statusFilter, setStatusFilter] = useState("all");
     const [fromDate, setFromDate] = useState("");
     const [toDate, setToDate] = useState("");
-
     const filteredStaff = useMemo(() => {
+        const staffData = [
+            { id: 1, name: "ABAASA ALBERT", email: "albertabaasa07@gmail.com", status: "Active", initials: "AA" },
+            { id: 2, name: "JANE DOE", email: "jane.doe@example.com", status: "Active", initials: "JD" },
+            { id: 3, name: "JOHN SMITH", email: "john.smith@odipay.com", status: "Inactive", initials: "JS" },
+            { id: 4, name: "SARAH CONNOR", email: "s.connor@sky.net", status: "Active", initials: "SC" },
+        ];
         return staffData.filter((staff) => {
             const matchesSearch = staff.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 staff.email.toLowerCase().includes(searchTerm.toLowerCase());
             const matchesStatus = statusFilter === "all" || staff.status.toLowerCase() === statusFilter.toLowerCase();
             return matchesSearch && matchesStatus;
         });
-    }, [searchTerm, statusFilter, staffData]);
+    }, [searchTerm, statusFilter]);
 
     return (
         <div>

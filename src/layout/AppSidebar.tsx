@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Link, useLocation } from "react-router";
+import { Link, useLocation } from "wouter";
+import { useAuthStore } from "../store/authStore";
 
 import { CloudDrizzleIcon, Computer, LayoutGrid, LocationEditIcon, LucideLogs, SendIcon, Settings, TicketsPlaneIcon, Users2, WalletCardsIcon, WalletIcon } from "lucide-react";
 import { useSidebar } from "../context/SidebarContext";
@@ -24,11 +25,6 @@ const navItems: NavItem[] = [
     icon: <GridIcon />,
     name: "Dashboard",
     path: "/dashboard",
-  },
-  {
-    icon: <Settings />,
-    name: "Settings",
-    path: "/settings",
   },
   {
     icon: <PieChartIcon />,
@@ -118,8 +114,9 @@ const systemItems: NavItem[] = [
 
 
 const AppSidebar: React.FC = () => {
+  const { user } = useAuthStore();
   const { isExpanded, isMobileOpen } = useSidebar();
-  const location = useLocation();
+  const [pathname] = useLocation();
 
   const [openSubmenu, setOpenSubmenu] = useState<{
     type: "main" | "payments" | "management" | "system";
@@ -130,10 +127,9 @@ const AppSidebar: React.FC = () => {
   );
   const subMenuRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
-  // const isActive = (path: string) => location.pathname === path;
   const isActive = useCallback(
-    (path: string) => location.pathname === path,
-    [location.pathname]
+    (path: string) => pathname === path,
+    [pathname]
   );
 
   useEffect(() => {
@@ -165,7 +161,7 @@ const AppSidebar: React.FC = () => {
     if (!submenuMatched) {
       setOpenSubmenu(null);
     }
-  }, [location, isActive]);
+  }, [pathname, isActive]);
 
   useEffect(() => {
     if (openSubmenu !== null) {
@@ -237,7 +233,7 @@ const AppSidebar: React.FC = () => {
           ) : (
             nav.path && (
               <Link
-                to={nav.path}
+                href={nav.path}
                 className={`menu-item group ${isActive(nav.path) ? "menu-item-active" : "menu-item-inactive"
                   }`}
               >
@@ -281,7 +277,7 @@ const AppSidebar: React.FC = () => {
                 {nav.subItems.map((subItem) => (
                   <li key={subItem.name}>
                     <Link
-                      to={subItem.path}
+                      href={subItem.path}
                       className={`menu-dropdown-item ${isActive(subItem.path)
                         ? "menu-dropdown-item-active"
                         : "menu-dropdown-item-inactive"
@@ -335,23 +331,24 @@ const AppSidebar: React.FC = () => {
         className={`py-8 flex ${!isExpanded ? "lg:justify-center" : "justify-start"
           }`}
       >
-        <Link to="/dashboard">
+        <Link href="/dashboard">
           {isExpanded || isMobileOpen ? (
             <>
-              <img
+              {/* <img
                 className="dark:hidden"
-                src="/images/logo/logo.svg"
+                src="/images/logo/logo-icon.svg"
                 alt="Logo"
-                width={150}
-                height={40}
+                width={32}
+                height={32}
               />
               <img
                 className="hidden dark:block"
-                src="/images/logo/logo-dark.svg"
+                src="/images/logo/logo-icon.svg"
                 alt="Logo"
-                width={150}
-                height={40}
-              />
+                width={32}
+                height={32}
+              /> */}
+              {/* <span className="text-gray-900 dark:text-white">Odipay</span> */}
             </>
           ) : (
             <img
@@ -365,23 +362,31 @@ const AppSidebar: React.FC = () => {
       </div>
 
       {/* User Profile Section */}
-      <div className={`p-2 border rounded bg-gray-200 dark:bg-gray-800 border-gray-200 dark:border-gray-800 mb-4 ${!isExpanded && !isMobileOpen ? "flex justify-center" : ""}`}>
+      <div className={`p-2 rounded bg-gray-100 dark:bg-gray-800 mb-4 ${!isExpanded && !isMobileOpen ? "flex justify-center" : ""}`}>
         <div className={`flex items-center gap-3 ${!isExpanded && !isMobileOpen ? "justify-center" : ""}`}>
           <div className="relative flex-shrink-0">
             <div className="flex items-center p-1 rounded-full bg-blue-500 dark:bg-blue-800">
-              <img
-                src="/images/user/owner.jpg"
-                alt="User Avatar"
-                className="w-10 h-10 rounded-full object-cover"
-              />
+              {user?.image ? (
+                <img
+                  src={user.image}
+                  alt="User Avatar"
+                  className="w-10 h-10 rounded-full object-cover"
+                />
+              ) : (
+                <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold">
+                  {user?.name?.charAt(0) || user?.email?.charAt(0) || "U"}
+                </div>
+              )}
             </div>
             <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white dark:border-gray-900 rounded-full"></span>
           </div>
           {(isExpanded || isMobileOpen) && (
             <div className="flex flex-col">
-              <span className="text-sm font-medium text-gray-600 dark:text-white">ODI PAY Support</span>
-              <span className="text-xs text-green-500 flex items-center gap-1">
-                Admin
+              <span className="text-sm font-medium text-gray-700 dark:text-white truncate max-w-[150px]">
+                {user?.name || "User"}
+              </span>
+              <span className="text-xs text-green-500 flex items-center gap-1 font-semibold">
+                {user?.role || "Developer"}
               </span>
             </div>
           )}

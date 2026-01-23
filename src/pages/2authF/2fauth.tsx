@@ -1,6 +1,6 @@
 import { ArrowRight, CheckCircle2, ChevronLeft, QrCode, Shield, Smartphone } from "lucide-react";
 import { useRef, useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link, useLocation } from "wouter";
 import PageMeta from "../../components/common/PageMeta";
 import Button from "../../components/ui/button/Button";
 import { useAuth } from "../../context/AuthContext";
@@ -9,7 +9,7 @@ export default function TwoFactorAuth() {
     const [step, setStep] = useState(1);
     const [otp, setOtp] = useState(["", "", "", "", "", ""]);
     const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
-    const navigate = useNavigate();
+    const [, setLocation] = useLocation();
     const { set2FAEnabled } = useAuth();
 
     const handleOtpChange = (index: number, value: string) => {
@@ -38,7 +38,7 @@ export default function TwoFactorAuth() {
             setStep(3);
             set2FAEnabled(true);
             setTimeout(() => {
-                navigate("/settings");
+                setLocation("/settings");
             }, 3000);
         }
     };
@@ -47,7 +47,7 @@ export default function TwoFactorAuth() {
         <div className="max-w-xl mx-auto py-10 px-4">
             <PageMeta title="Setup 2FA | Odipay" description="Enhance your account security" />
 
-            <Link to="/settings" className="inline-flex items-center text-sm text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white mb-8 group">
+            <Link href="/settings" className="inline-flex items-center text-sm text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white mb-8 group">
                 <ChevronLeft className="w-4 h-4 mr-1 transition-transform group-hover:-translate-x-1" />
                 Back to Settings
             </Link>
